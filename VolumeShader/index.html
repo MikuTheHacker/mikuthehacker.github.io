@@ -1,39 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Volume Shader BM - Multi-Device</title>
+    <title>VolumeShader</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            overflow: hidden; 
-            background: #0a0a0a; 
-            touch-action: none; /* Evita zoom accidental en móviles */
+        body { margin: 0; background: #000; overflow: hidden; }
+        canvas { display: block; }
+        #info { position: absolute; top: 10px; left: 10px; color: white; font-family: monospace; font-size: 12px; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+</head>
+<body>
+    <div id="info">VOLUME SHADER - CON LAG INTENCIONAL</div>
+    <script>
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 100);
+        camera.position.z = 5;
+
+        // VOLUMEN GRANDE PARA GENERAR LAG
+        const SIZE = 128;
+        const data = new Uint8Array(SIZE * SIZE * SIZE * 4);
+        for(let i = 0; i < data.length; i += 4) {
+            const x = (i/4) % SIZE;
+            const y = Math.floor((i/4)/SIZE) % SIZE;
+            const z = Math.floor((i/4)/(SIZE*SIZE));
+            
+            // Cálculos pesados e innecesarios para generar lag
+            let val = 0;
+            for(let j = 0; j < 100; j++) val += Math.sin(x*j + y*j + z*j);
+            
+            data[i] = Math.abs(val * 10);
+            data[i+1] = Math.abs(val * 5);
+            data[i+2] = Math.abs(val * 15);
+            data[i+3] = Math.abs(val * 2);
         }
-        #controls-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            background: rgba(0,0,0,0.8);
-            z-index: 100;
+
+        const tex = new THREE.Data3DTexture(data, SIZE, SIZE, SIZE);
+        tex.format = THREE.RGBAFormat;
+        tex.needsUpdate = true;
+
+        const mat = new THREE.ShaderMaterial({
+            uniforms: { vol: { value: tex }, time: { value: 0 } },
+            vertexShader: `
+                varying vec3 vP;
+                void main() {
+                    vP = position;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler3D vol;
+                uniform float time;
+                varying vec3 vP;
+
+                void main() {
+                    vec3 dir = normalize(vP - cameraPosition);
+                    vec3 pos = vP;
+                    vec4 col = vec4(0);
+
+                    // Bucle MUY largo para generar lag
+                    for(int i = 0; i < 200; i++) {
+                        vec3 tP = (pos + 1.0) * 0.5;
+                        // Cálculos redundantes
+                        for(int j = 0; j < 50; j++) {
+                            tP.x += Math.sin(time + tP.y * j);
+                            tP.y += Math.cos(time + tP.z * j);
+                        }
+                        vec4 samp = texture3D(vol, tP);
+                        col += samp * 0.01;
+                        pos += dir * 0.01;
+                    }
+                    gl_FragColor = col;
+                }
+            `
+        });
+
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(2,2,2), mat);
+        scene.add(mesh);
+
+        // Función con retrasos intencionales
+        function animate() {
+            // Retraso cada frame
+            setTimeout(() => {
+                requestAnimationFrame(animate);
+                mat.uniforms.time.value += 0.01;
+                // Rotación lenta con pausas
+                setTimeout(() => {
+                    mesh.rotation.x += 0.001;
+                    mesh.rotation.y += 0.002;
+                    renderer.render(scene, camera);
+                }, 50); // Retraso de 50ms por frame
+            }, 30); // Retraso extra entre frames
         }
-        .control-group {
-            min-width: 180px;
-            color: white;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 12px;
-            opacity: 0.8;
+        animate();
+    </script>
+</body>
+</html>
         }
         select, input[type="range"] {
             width: 100%;
