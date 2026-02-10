@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World - Infinite Animation</title>
+    <style>
+        /* Reset and base setup */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            perspective: 1000px;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Rotating 3D main container */
+        .universe {
+            position: absolute;
+            width: 200vw;
+            height: 200vh;
+            top: -50vh;
+            left: -50vw;
+            transform-style: preserve-3d;
+            animation: rotateUniverse 240s linear infinite;
+        }
+
+        /* Background layers with animated gradients */
+        .background-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from var(--gradient-angle, 0deg),
+                #1a2a6c, #b21f1f, #fdbb2d, #1a2a6c
+            );
+            animation: shiftGradient 30s ease-in-out infinite alternate,
+                       pulseBackground 15s ease infinite alternate;
+            opacity: 0.8;
+            filter: blur(80px);
+            transform: translateZ(-500px);
+        }
+
+        .middle-layer {
+            background: radial-gradient(
+                circle at var(--focus-x, 20%) var(--focus-y, 30%),
+                #2c3e50, #000000
+            );
+            animation: moveFocusPoint 25s ease infinite alternate,
+                       glowMiddle 20s ease infinite alternate;
+            opacity: 0.6;
+            filter: blur(40px);
+            transform: translateZ(-300px);
+        }
+
+        /* Infinite particles */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: moveParticle calc(var(--duration, 20) * 1s) linear infinite,
+                       changeSize calc(var(--size-duration, 15) * 1s) ease infinite alternate,
+                       changeOpacity calc(var(--opacity-duration, 10) * 1s) ease infinite alternate;
+            transform: translateZ(var(--z, 0px));
+            box-shadow: 0 0 15px var(--color, #fff);
+        }
+
+        /* "Hello World" element with complex animations */
+        .main-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-style: preserve-3d;
+            transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
+            animation: rotateText 35s linear infinite,
+                       floatText 8s ease-in-out infinite alternate;
+        }
+
+        .main-text span {
+            display: inline-block;
+            font-size: 8vw;
+            font-weight: 900;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            background-image: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+            background-size: 300% 100%;
+            animation: shiftTextGradient 5s linear infinite,
+                       vibrateLetter calc(var(--vibe-duration, 2) * 1s) ease infinite;
+            transform: translateZ(100px);
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Animated geometric shapes around the text */
+        .shape {
+            position: absolute;
+            transform-style: preserve-3d;
+            animation: orbitShape calc(var(--orbit-duration, 30) * 1s) linear infinite,
+                       rotateShape calc(var(--rotate-duration, 15) * 1s) linear infinite;
+        }
+
+        .square {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(45deg, #ff9800, #f44336);
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+            transform: rotateZ(45deg) translateZ(50px);
+            opacity: 0.7;
+        }
+
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 75px solid transparent;
+            border-right: 75px solid transparent;
+            border-bottom: 130px solid #4caf50;
+            transform: translateZ(80px);
+            opacity: 0.7;
+        }
+
+        .circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2196f3, #9c27b0);
+            transform: translateZ(30px);
+            opacity: 0.7;
+        }
+
+        /* Infinite animation keyframes */
+        @keyframes rotateUniverse {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        @keyframes shiftGradient {
+            0% { --gradient-angle: 0deg; }
+            100% { --gradient-angle: 360deg; }
+        }
+
+        @keyframes pulseBackground {
+            0% { transform: translateZ(-500px) scale(1); }
+            100% { transform: translateZ(-500px) scale(1.2); }
+        }
+
+        @keyframes moveFocusPoint {
+            0% { --focus-x: 20%; --focus-y: 30%; }
+            25% { --focus-x: 80%; --focus-y: 20%; }
+            50% { --focus-x: 70%; --focus-y: 80%; }
+            75% { --focus-x: 30%; --focus-y: 70%; }
+            100% { --focus-x: 20%; --focus-y: 30%; }
+        }
+
+        @keyframes glowMiddle {
+            0% { opacity: 0.4; }
+            100% { opacity: 0.8; }
+        }
+
+        @keyframes moveParticle {
+            0% { 
+                top: 110%; 
+                left: var(--start-x, 0%); 
+                transform: translateZ(var(--z, 0px)) scale(0.5);
+            }
+            100% { 
+                top: -10%; 
+                left: var(--end-x, 100%); 
+                transform: translateZ(calc(var(--z, 0px) + 200px)) scale(1);
+            }
+        }
+
+        @keyframes changeSize {
+            0% { transform: translateZ(var(--z, 0px)) scale(0.2); }
+            100% { transform: translateZ(var(--z, 0px)) scale(1.2); }
+        }
+
+        @keyframes changeOpacity {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes rotateText {
+            0% { transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg); }
+            100% { transform: translate(-50%, -50%) rotateX(360deg) rotateY(720deg); }
+        }
+
+        @keyframes floatText {
+            0% { transform: translate(-50%, -52%) rotateX(0deg) rotateY(0deg); }
+            100% { transform: translate(-50%, -48%) rotateX(5deg) rotateY(5deg); }
+        }
+
+        @keyframes shiftTextGradient {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 300% 0%; }
+        }
+
+        @keyframes vibrateLetter {
+            0% { transform: translateZ(100px) translateX(0px) translateY(0px); }
+            25% { transform: translateZ(100px) translateX(2px) translateY(-2px); }
+            50% { transform: translateZ(100px) translateX(-2px) translateY(2px); }
+            75% { transform: translateZ(100px) translateX(1px) translateY(1px); }
+            100% { transform: translateZ(100px) translateX(0px) translateY(0px); }
+        }
+
+        @keyframes orbitShape {
+            0% { transform: translate(-50%, -50%) rotate(0deg) translateX(400px) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg) translateX(400px) rotate(-360deg); }
+        }
+
+        @keyframes rotateShape {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="universe">
+        <div class="background-layer"></div>
+        <div class="background-layer middle-layer"></div>
+        <div class="particles" id="particles-container"></div>
+        <div class="main-text">
+            <span style="--vibe-duration: 1.8;">H</span>
+            <span style="--vibe-duration: 2.1;">e</span>
+            <span style="--vibe-duration: 1.9;">l</span>
+            <span style="--vibe-duration: 2.3;">l</span>
+            <span style="--vibe-duration: 2.0;">o</span>
+            <span style="--vibe-duration: 2.5;"> </span>
+            <span style="--vibe-duration: 1.7;">W</span>
+            <span style="--vibe-duration: 2.2;">o</span>
+            <span style="--vibe-duration: 2.4;">r</span>
+            <span style="--vibe-duration: 1.6;">l</span>
+            <span style="--vibe-duration: 2.0;">d</span>
+        </div>
+        <div class="shape" style="--orbit-duration: 28; --rotate-duration: 12;">
+            <div class="square"></div>
+        </div>
+        <div class="shape" style="--orbit-duration: 35; --rotate-duration: 18;">
+            <div class="triangle"></div>
+        </div>
+        <div class="shape" style="--orbit-duration: 22; --rotate-duration: 15;">
+            <div class="circle"></div>
+        </div>
+    </div>
+
+    <script>
+        // Dynamic infinite particle generator
+        const particlesContainer = document.getElementById('particles-container');
+        const particlesAmount = 200;
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Random values for unique animations
+            const duration = Math.random() * 40 + 10;
+            const sizeDuration = Math.random() * 20 + 5;
+            const opacityDuration = Math.random() * 15 + 5;
+            const z = Math.random() * 400 - 200;
+            const startX = Math.random() * 100;
+            const endX = Math.random() * 100;
+            const size = Math.random() * 10 + 1;
+            const colors = ['#ff00ff', '#00ffff', '#ffff00', '#ff0000', '#00ff00', '#0000ff'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            // Apply variable styles
+            particle.style.setProperty('--duration', duration);
+            particle.style.setProperty('--size-duration', sizeDuration);
+            particle.style.setProperty('--opacity-duration', opacityDuration);
+            particle.style.setProperty('--z', `${z}px`);
+            particle.style.setProperty('--start-x', `${startX}%`);
+            particle.style.setProperty('--end-x', `${endX}%`);
+            particle.style.setProperty('--color', color);
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+
+            return particle;
+        }
+
+        // Create initial particles
+        for (let i = 0; i < particlesAmount; i++) {
+            particlesContainer.appendChild(createParticle());
+        }
+
+        // Replace particles to maintain infinite flow
+        setInterval(() => {
+            const oldParticles = document.querySelectorAll('.particle');
+            const randomIndex = Math.floor(Math.random() * oldParticles.length);
+            particlesContainer.removeChild(oldParticles[randomIndex]);
+            particlesContainer.appendChild(createParticle());
+        }, 200);
+    </script>
+</body>
+</html>
+  
