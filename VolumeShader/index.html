@@ -23,13 +23,7 @@
         input, select { width: 180px; padding: 5px; border: none; border-radius: 4px; }
         canvas { display: block; }
     </style>
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js"
-            }
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 </head>
 <body>
     <div id="controls">
@@ -51,9 +45,8 @@
         </div>
     </div>
 
-    <script type="module">
-        import * as THREE from 'three';
-
+    <script>
+        // Scene setup
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: false });
@@ -61,6 +54,7 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         document.body.appendChild(renderer.domElement);
 
+        // Volume texture
         function createVolumeTexture() {
             const size = 32;
             const data = new Uint8Array(size * size * size * 4);
@@ -90,6 +84,7 @@
             return texture;
         }
 
+        // Volume material
         const volumeTexture = createVolumeTexture();
         const volumeMaterial = new THREE.ShaderMaterial({
             uniforms: {
@@ -152,12 +147,14 @@
             depthWrite: false
         });
 
+        // Volume mesh
         const volumeGeo = new THREE.BoxGeometry(2, 2, 2);
         const volumeMesh = new THREE.Mesh(volumeGeo, volumeMaterial);
         scene.add(volumeMesh);
 
         camera.position.z = 4;
 
+        // Controls
         document.getElementById('blendMode').addEventListener('change', (e) => {
             const modes = { additive: 0, alpha: 1, maximum: 2 };
             volumeMaterial.uniforms.blendMode.value = modes[e.target.value];
@@ -171,6 +168,7 @@
             volumeMaterial.uniforms.stepCount.value = parseInt(e.target.value);
         });
 
+        // Animation
         function animate() {
             requestAnimationFrame(animate);
             volumeMesh.rotation.x += 0.004;
@@ -180,6 +178,7 @@
         }
         animate();
 
+        // Resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
@@ -188,62 +187,7 @@
     </script>
 </body>
 </html>
-        <div class="control-group">
-            <label for="blendMode">Blending Mode (BM)</label>
-            <select id="blendMode">
-                <option value="additive">Additive</option>
-                <option value="alpha">Alpha Blend</option>
-                <option value="maximum">Maximum</option>
-            </select>
-        </div>
-        <div class="control-group">
-            <label for="density">Volume Density</label>
-            <input type="range" id="density" min="0.1" max="1.5" step="0.1" value="0.6">
-        </div>
-        <div class="control-group">
-            <label for="stepCount">Sampling Steps</label>
-            <input type="range" id="stepCount" min="20" max="120" step="10" value="40">
-        </div>
-    </div>
-
-    <script type="module">
-        import * as THREE from 'three';
-
-        // Scene setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: false }); // Disable AA for speed
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Limit pixel ratio
-        document.body.appendChild(renderer.domElement);
-
-        // Optimized volume texture (32x32x32 = faster performance)
-        function createVolumeTexture() {
-            const size = 32;
-            const data = new Uint8Array(size * size * size * 4);
-            for (let z = 0; z < size; z++) {
-                for (let y = 0; y < size; y++) {
-                    for (let x = 0; x < size; x++) {
-                        const i = (x + y * size + z * size * size) * 4;
-                        // Sphere shape with noise
-                        const dx = x/size - 0.5;
-                        const dy = y/size - 0.5;
-                        const dz = z/size - 0.5;
-                        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
-                        const opacity = Math.max(0, 1 - dist * 2.2);
-                        // Simple color gradient
-                        data[i] = 180 * (x/size);     // Red
-                        data[i+1] = 220 * (y/size);   // Green
-                        data[i+2] = 255 * (z/size);   // Blue
-                        data[i+3] = 255 * opacity;    // Opacity
-                    }
-                }
-            }
-            const texture = new THREE.Data3DTexture(data, size, size, size);
-            texture.format = THREE.RGBAFormat;
-            texture.type = THREE.UnsignedByteType;
-            texture.minFilter = THREE.LinearFilter;
-            texture.magFilter = THREE.LinearFilter;
+EE.LinearFilter;
             texture.unpackAlignment = 1;
             texture.needsUpdate = true;
             return texture;
