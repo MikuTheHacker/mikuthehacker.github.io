@@ -96,6 +96,213 @@
         .particle.cross { clip-path: polygon(40% 0%, 60% 0%, 60% 40%, 100% 40%, 100% 60%, 60% 60%, 60% 100%, 40% 100%, 40% 60%, 0% 60%, 0% 40%, 40% 40%); }
         .particle.circle { border-radius: 50%; }
 
+        /* MAIN TEXT - HYBRID 2D+3D (COMPLETE "HELLO WORLD") */
+        .hello-master {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transform-style: preserve-3d;
+            z-index: 20;
+        }
+
+        .hello-master span {
+            display: inline-block;
+            font-size: 9vw;
+            font-weight: 900;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            background-image: linear-gradient(90deg, #ff00ff, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
+            background-size: 3000% 100%;
+            transform: translateZ(var(--t-z, 200px)) rotateX(var(--t-rx, 0deg)) rotateY(var(--t-ry, 0deg)) rotateZ(var(--t-rz, 0deg));
+            animation: 
+                sweep-text 0.8s linear infinite,
+                shake-text 0.05s ease infinite,
+                tumble-text 2s linear infinite,
+                float-text 0.5s ease infinite alternate,
+                blast-text 1s ease infinite alternate;
+            text-shadow: 0 0 20px var(--t-glow), 0 0 40px var(--t-glow), 0 0 60px var(--t-glow), 0 0 80px var(--t-glow), 0 0 100px var(--t-glow);
+        }
+
+        /* GIANT SHAPES - 2D+3D OVERLAP */
+        .shape-monsters {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .shape-monster {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            background: linear-gradient(45deg, var(--sm-c1), var(--sm-c2));
+            transform: translateZ(var(--sm-z, 300px)) rotateX(var(--sm-rx, 0deg)) rotateY(var(--sm-ry, 0deg)) rotateZ(var(--sm-rz, 0deg));
+            animation: 
+                roam-shape calc(var(--sm-s, 25) * 1s) linear infinite,
+                whirl-shape calc(var(--sm-r, 6) * 1s) linear infinite,
+                pump-shape calc(var(--sm-p, 1) * 1s) ease infinite alternate,
+                blur-shape calc(var(--sm-b, 3) * 1s) ease infinite alternate;
+            filter: blur(15px) contrast(300%) saturate(200%);
+            opacity: 0.7;
+        }
+
+        /* INSANE KEYFRAMES - NO MERCY */
+        @keyframes spin-mega { 
+            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 
+            100% { transform: rotateX(720deg) rotateY(1440deg) rotateZ(360deg); } 
+        }
+        @keyframes pulse-mega { 
+            0% { transform: scale(1); } 
+            100% { transform: scale(2); } 
+        }
+        @keyframes slide-layer { 
+            0% { transform: translateZ(var(--z, -5000px)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate(0,0); } 
+            100% { transform: translateZ(var(--z, -5000px)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate(-5%, -3%); } 
+        }
+        @keyframes flicker-opa { 
+            0%,5%,10%,15%,20%,25%,30%,35%,40%,45%,50%,55%,60%,65%,70%,75%,80%,85%,90%,95%,100% { opacity: calc(var(--o, 0.1) + 0.1); } 
+            2%,7%,12%,17%,22%,27%,32%,37%,42%,47%,52%,57%,62%,67%,72%,77%,82%,87%,92%,97% { opacity: 0; } 
+        }
+        @keyframes dash-particle { 
+            0% { top: -100%; left: -100%; } 
+            25% { top: 200%; left: 50%; } 
+            50% { top: 50%; left: 200%; } 
+            75% { top: 200%; left: 200%; } 
+            100% { top: -100%; left: -100%; } 
+        }
+        @keyframes spin-particle { 
+            0% { transform: translateZ(var(--p-z, 0px)) rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 
+            100% { transform: translateZ(var(--p-z, 0px)) rotateX(1440deg) rotateY(720deg) rotateZ(360deg); } 
+        }
+        @keyframes blink-particle { 
+            0%,25%,50%,75%,100% { opacity: 1; } 
+            12.5%,37.5%,62.5%,87.5% { opacity: 0; } 
+        }
+        @keyframes swell-particle { 
+            0% { transform: scale(0.1); } 
+            100% { transform: scale(5); } 
+        }
+        @keyframes skew-particle { 
+            0% { transform: skewX(0deg) skewY(0deg); } 
+            25% { transform: skewX(45deg) skewY(30deg); } 
+            50% { transform: skewX(-45deg) skewY(-30deg); } 
+            75% { transform: skewX(30deg) skewY(45deg); } 
+            100% { transform: skewX(-30deg) skewY(-45deg); } 
+        }
+        @keyframes sweep-text { 
+            0% { background-position: 0% 0%; } 
+            100% { background-position: 3000% 0%; } 
+        }
+        @keyframes shake-text { 
+            0% { transform: translate(0px,0px); } 
+            25% { transform: translate(10px,-10px); } 
+            50% { transform: translate(-10px,10px); } 
+            75% { transform: translate(5px,-5px); } 
+            100% { transform: translate(-5px,5px); } 
+        }
+        @keyframes tumble-text { 
+            0% { transform: translateZ(var(--t-z, 200px)) rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 
+            100% { transform: translateZ(var(--t-z, 200px)) rotateX(360deg) rotateY(720deg) rotateZ(360deg); } 
+        }
+        @keyframes float-text { 
+            0% { transform: translateY(0px); } 
+            100% { transform: translateY(-50px); } 
+        }
+        @keyframes blast-text { 
+            0% { filter: brightness(1); } 
+            100% { filter: brightness(5); } 
+        }
+        @keyframes roam-shape { 
+            0% { top: 0%; left: 0%; } 
+            25% { top: 150%; left: 25%; } 
+            50% { top: 50%; left: 150%; } 
+            75% { top: 100%; left: 100%; } 
+            100% { top: 0%; left: 0%; } 
+        }
+        @keyframes whirl-shape { 
+            0% { transform: translateZ(var(--sm-z, 300px)) rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 
+            100% { transform: translateZ(var(--sm-z, 300px)) rotateX(720deg) rotateY(360deg) rotateZ(1080deg); } 
+        }
+        @keyframes pump-shape { 
+            0% { transform: scale(0.5); } 
+            100% { transform: scale(2); } 
+        }
+        @keyframes blur-shape { 
+            0% { filter: blur(5px) contrast(200%) saturate(150%); } 
+            100% { filter: blur(25px) contrast(400%) saturate(300%); } 
+        }
+    </style>
+</head>
+<body>
+    <div class="mega-hybrid">
+        <!-- 50 BACKGROUND LAYERS -->
+        <div class="bg-layer grid-3d" style="--z: -10000px; --s: 8; --f: 1.5; --o: 0.1; --rx: 10deg; --ry: 15deg;"></div>
+        <div class="bg-layer stripes-2d" style="--z: -9800px; --s: 7; --f: 2; --o: 0.12; --a: 15deg; --c1: #ff00ff; --c2: #000; --c3: #00ffff; --c4: #000;"></div>
+        <div class="bg-layer dots-mix" style="--z: -9600px
+        }
+
+        .grid-3d {
+            background: 
+                linear-gradient(rgba(255,0,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(rgba(255,255,0,0.08) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255,0,0,0.08) 2px, transparent 2px),
+                linear-gradient(rgba(0,255,0,0.05) 3px, transparent 3px),
+                linear-gradient(90deg, rgba(0,0,255,0.05) 3px, transparent 3px);
+            background-size: 5px 5px, 5px 5px, 15px 15px, 15px 15px, 30px 30px, 30px 30px;
+        }
+
+        .stripes-2d {
+            background: repeating-linear-gradient(
+                var(--a, 0deg),
+                var(--c1, #ff00ff) 0px,
+                var(--c2, #000) 5px,
+                var(--c3, #00ffff) 6px,
+                var(--c4, #000) 10px
+            );
+            background-size: 20px 20px;
+            filter: blur(2px);
+        }
+
+        .dots-mix {
+            background-image: 
+                radial-gradient(circle, var(--d1, #fff) 1px, transparent 1px),
+                radial-gradient(circle, var(--d2, #000) 2px, transparent 2px);
+            background-size: 4px 4px, 8px 8px;
+            transform: translateZ(var(--z, -2000px)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) rotateZ(var(--rz, 0deg));
+        }
+
+        /* 10,000+ PARTICLES (2D & 3D) */
+        .particle-ocean {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .particle {
+            position: absolute;
+            background: var(--p-col, #fff);
+            transform: translateZ(var(--p-z, 0px)) rotateX(var(--p-rx, 0deg)) rotateY(var(--p-ry, 0deg)) rotateZ(var(--p-rz, 0deg));
+            animation: 
+                dash-particle calc(var(--p-s, 5) * 1s) linear infinite,
+                spin-particle calc(var(--p-r, 3) * 1s) linear infinite,
+                blink-particle calc(var(--p-b, 1) * 1s) step-end infinite,
+                swell-particle calc(var(--p-w, 2) * 1s) ease infinite alternate,
+                skew-particle calc(var(--p-k, 1.5) * 1s) ease infinite alternate;
+            box-shadow: 0 0 10px var(--p-col, #fff), 0 0 20px var(--p-col, #fff), 0 0 30px var(--p-col, #fff), 0 0 40px var(--p-col, #fff);
+            filter: brightness(calc(var(--p-br, 1) + 0.8)) contrast(200%);
+        }
+
+        .particle.square { border-radius: 0; }
+        .particle.triangle { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        .particle.star { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+        .particle.hex { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
+        .particle.cross { clip-path: polygon(40% 0%, 60% 0%, 60% 40%, 100% 40%, 100% 60%, 60% 60%, 60% 100%, 40% 100%, 40% 60%, 0% 60%, 0% 40%, 40% 40%); }
+        .particle.circle { border-radius: 50%; }
+
         /* MAIN TEXT - HYBRID 2D+3D */
         .hello-master {
             position: absolute;
