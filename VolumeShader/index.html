@@ -187,6 +187,159 @@
     </script>
 </body>
 </html>
+        </div>
+        <div class="control-group">
+            <label for="density">Volume Density</label>
+            <input type="range" id="density" min="0.1" max="1.5" step="0.1" value="0.6">
+        </div>
+        <div class="control-group">
+            <label for="stepCount">Sampling Steps</label>
+            <input type="range" id="stepCount" min="20" max="120" step="10" value="40">
+        </div>
+    </div>
+
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        document.body.appendChild(renderer.domElement);
+
+        // Volume texture
+        function createVolumeTexture() {
+            const size = 32;
+            const data = new Uint8Array(size * size * size * 4);
+            for (let z = 0; z < size; z++) {
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        const i = (x + y * size + z * size * size) * 4;
+                        const dx = x/size - 0.5;
+                        const dy = y/size - 0.5;
+                        const dz = z/size - 0.5;
+                        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                        const opacity = Math.max(0, 1 - dist * 2.2);
+                        data[i] = 180 * (x/size);
+                        data[i+1] = 220 * (y/size);
+                        data[i+2] = 255 * (z/size);
+                        data[i+3] = 255 * opacity;
+                    }
+                }
+            }
+            const texture = new THREE.Data3DTexture(data, size, size, size);
+            texture.format = THREE.RGBAFormat;
+            texture.type = THREE.UnsignedByteType;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            texture.unpackAlignment = 1;
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        // Volume material
+        const volumeTexture = createVolumeTexture();
+        const volumeMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                volumeTexture: { value: volumeTexture },
+                blendMode: { value: 0 },
+                density: { value: 0.6 },
+                stepCount: { value: 40 },
+                invSize: { value: new THREE.Vector3(1/32, 1/32, 1/32) },
+                cameraPos: { value: camera.position }
+            },
+            vertexShader: `
+                varying vec3 vPos;
+                void main() {
+                    vPos = position;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler3D volumeTexture;
+                uniform int blendMode;
+                uniform float density;
+                uniform int stepCount;
+                uniform vec3 invSize;
+                uniform vec3 cameraPos;
+
+                varying vec3 vPos;
+
+                void main() {
+                    vec3 rayOrigin = cameraPos;
+                    vec3 rayDir = normalize(vPos - rayOrigin);
+                    vec3 rayStep = rayDir / float(stepCount) * 2.0;
+                    vec3 currPos = (vPos + 1.0) * 0.5;
+                    
+                    vec4 accum = vec4(0.0);
+
+                    for (int i = 0; i < stepCount; i++) {
+                        if (currPos.x < 0.0 || currPos.x > 1.0 || 
+                            currPos.y < 0.0 || currPos.y > 1.0 || 
+                            currPos.z < 0.0 || currPos.z > 1.0 ||
+                            accum.a > 0.98) break;
+
+                        vec4 samp = texture3D(volumeTexture, currPos);
+                        samp.a *= density;
+
+                        if (blendMode == 0) {
+                            accum += samp * (1.0 - accum.a);
+                        } else if (blendMode == 1) {
+                            accum = mix(accum, samp, samp.a);
+                        } else {
+                            accum = max(accum, samp);
+                        }
+
+                        currPos += rayStep * invSize;
+                    }
+
+                    gl_FragColor = accum;
+                }
+            `,
+            transparent: true,
+            depthWrite: false
+        });
+
+        // Volume mesh
+        const volumeGeo = new THREE.BoxGeometry(2, 2, 2);
+        const volumeMesh = new THREE.Mesh(volumeGeo, volumeMaterial);
+        scene.add(volumeMesh);
+
+        camera.position.z = 4;
+
+        // Controls
+        document.getElementById('blendMode').addEventListener('change', (e) => {
+            const modes = { additive: 0, alpha: 1, maximum: 2 };
+            volumeMaterial.uniforms.blendMode.value = modes[e.target.value];
+        });
+
+        document.getElementById('density').addEventListener('input', (e) => {
+            volumeMaterial.uniforms.density.value = parseFloat(e.target.value);
+        });
+
+        document.getElementById('stepCount').addEventListener('input', (e) => {
+            volumeMaterial.uniforms.stepCount.value = parseInt(e.target.value);
+        });
+
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+            volumeMesh.rotation.x += 0.004;
+            volumeMesh.rotation.y += 0.008;
+            volumeMaterial.uniforms.cameraPos.value = camera.position;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
 EE.LinearFilter;
             texture.unpackAlignment = 1;
             texture.needsUpdate = true;
