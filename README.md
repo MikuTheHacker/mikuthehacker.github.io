@@ -1,2 +1,2 @@
-# mikuthehacker.github.io
-The code for my pages is here!!!
+# Miku
+All pages made by Miku
