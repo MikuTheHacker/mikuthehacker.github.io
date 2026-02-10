@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volume Shader BM</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #111; }
+        #controls { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 8px; color: white; font-family: Arial, sans-serif; }
+        .control-group { margin: 10px 0; }
+        label { display: block; margin-bottom: 5px; font-size: 12px; }
+        input, select { width: 180px; padding: 5px; border: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div class="control-group">
+            <label for="blendMode">Blending Mode (BM)</label>
+            <select id="blendMode">
+                <option value="additive">Additive</option>
+                <option value="alpha">Alpha Blend</option>
+                <option value="maximum">Maximum</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="density">Volume Density</label>
+            <input type="range" id="density" min="0.1" max="2" step="0.1" value="0.8">
+        </div>
+        <div class="control-group">
+            <label for="stepCount">Sampling Steps</label>
+            <input type="range" id="stepCount" min="20" max="200" step="10" value="80">
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // Scene, Camera and Renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
+
+        // Create volume texture (simulated data)
+        function createVolumeTexture(size) {
+            const data = new Uint8Array(size * size * size * 4);
+            for (let z = 0; z < size; z++) {
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        const i = (x + y * size + z * size * size) * 4;
+                        // Sphere shape inside the volume
+                        const dx = x / size - 0.5;
+                        const dy = y / size - 0.5;
+                        const dz = z / size - 0.5;
+                        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                        const val = Math.max(0, 1.0 - dist * 2.5);
+                        data[i] = 255 * (0.5 + 0.5 * Math.sin(x * 5)); // Red channel
+                        data[i+1] = 255 * (0.5 + 0.5 * Math.sin(y * 5)); // Green channel
+                        data[i+2] = 255 * (0.5 + 0.5 * Math.sin(z * 5)); // Blue channel
+                        data[i+3] = 255 * val; // Alpha (opacity) channel
+                    }
+                }
+            }
+            const texture = new THREE.Data3DTexture(data, size, size, size);
+            texture.format = THREE.RGBAFormat;
+            texture.type = THREE.UnsignedByteType;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            texture.unpackAlignment = 1;
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        // Volume shader
+        const volumeTexture = createVolumeTexture(64);
+        const volumeMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                volumeTexture: { value: volumeTexture },
+                blendMode: { value: 0 }, // 0=additive, 1=alpha, 2=maximum
+                density: { value: 0.8 },
+                stepCount: { value: 80 },
+                invSize: { value: new THREE.Vector3(1/64, 1/64, 1/64) },
+                cameraPosition: { value: camera.position }
+            },
+            vertexShader: `
+                varying vec3 vPosition;
+                void main() {
+                    vPosition = position;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler3D volumeTexture;
+                uniform int blendMode;
+                uniform float density;
+                uniform int stepCount;
+                uniform vec3 invSize;
+                uniform vec3 cameraPosition;
+
+                varying vec3 vPosition;
+
+                void main() {
+                    vec3 rayOrigin = cameraPosition;
+                    vec3 rayDir = normalize(vPosition - rayOrigin);
+                    vec3 rayStep = rayDir / float(stepCount) * 2.0;
+                    vec3 currentPos = (vPosition + 1.0) * 0.5; // Convert to [0,1] range
+                    
+                    vec4 colorAccum = vec4(0.0);
+
+                    for (int i = 0; i < stepCount; i++) {
+                        // Stop if out of volume bounds
+                        if (currentPos.x < 0.0 || currentPos.x > 1.0 || 
+                            currentPos.y < 0.0 || currentPos.y > 1.0 || 
+                            currentPos.z < 0.0 || currentPos.z > 1.0) break;
+
+                        vec4 sample = texture3D(volumeTexture, currentPos);
+                        sample.a *= density;
+
+                        // Apply selected blending mode
+                        if (blendMode == 0) { // Additive
+                            colorAccum += sample * (1.0 - colorAccum.a);
+                        } else if (blendMode == 1) { // Alpha Blend
+                            colorAccum = mix(colorAccum, sample, sample.a);
+                        } else if (blendMode == 2) { // Maximum
+                            colorAccum = max(colorAccum, sample);
+                        }
+
+                        currentPos += rayStep * invSize;
+                    }
+
+                    gl_FragColor = colorAccum;
+                }
+            `,
+            transparent: true,
+            depthWrite: false
+        });
+
+        // Volume container geometry (cube)
+        const volumeGeometry = new THREE.BoxGeometry(2, 2, 2);
+        const volumeMesh = new THREE.Mesh(volumeGeometry, volumeMaterial);
+        scene.add(volumeMesh);
+
+        camera.position.z = 4;
+
+        // Control event listeners
+        document.getElementById('blendMode').addEventListener('change', (e) => {
+            const modes = { additive: 0, alpha: 1, maximum: 2 };
+            volumeMaterial.uniforms.blendMode.value = modes[e.target.value];
+        });
+
+        document.getElementById('density').addEventListener('input', (e) => {
+            volumeMaterial.uniforms.density.value = parseFloat(e.target.value);
+        });
+
+        document.getElementById('stepCount').addEventListener('input', (e) => {
+            volumeMaterial.uniforms.stepCount.value = parseInt(e.target.value);
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            volumeMesh.rotation.x += 0.005;
+            volumeMesh.rotation.y += 0.01;
+            volumeMaterial.uniforms.cameraPosition.value = camera.position;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
+            texture.type = THREE.UnsignedByteType;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            texture.unpackAlignment = 1;
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        // Shader de volumen
+        const volumeTexture = createVolumeTexture(64);
+        const volumeMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                volumeTexture: { value: volumeTexture },
+                blendMode: { value: 0 }, // 0=aditivo, 1=alpha, 2=máximo
+                density: { value: 0.8 },
+                stepCount: { value: 80 },
+                invSize: { value: new THREE.Vector3(1/64, 1/64, 1/64) },
+                cameraPosition: { value: camera.position }
+            },
+            vertexShader: `
+                varying vec3 vPosition;
+                void main() {
+                    vPosition = position;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler3D volumeTexture;
+                uniform int blendMode;
+                uniform float density;
+                uniform int stepCount;
+                uniform vec3 invSize;
+                uniform vec3 cameraPosition;
+
+                varying vec3 vPosition;
+
+                void main() {
+                    vec3 rayOrigin = cameraPosition;
+                    vec3 rayDir = normalize(vPosition - rayOrigin);
+                    vec3 rayStep = rayDir / float(stepCount) * 2.0;
+                    vec3 currentPos = (vPosition + 1.0) * 0.5; // Convertir a [0,1]
+                    
+                    vec4 colorAccum = vec4(0.0);
+
+                    for (int i = 0; i < stepCount; i++) {
+                        if (currentPos.x < 0.0 || currentPos.x > 1.0 || 
+                            currentPos.y < 0.0 || currentPos.y > 1.0 || 
+                            currentPos.z < 0.0 || currentPos.z > 1.0) break;
+
+                        vec4 sample = texture3D(volumeTexture, currentPos);
+                        sample.a *= density;
+
+                        if (blendMode == 0) { // Aditivo
+                            colorAccum += sample * (1.0 - colorAccum.a);
+                        } else if (blendMode == 1) { // Alpha Blend
+                            colorAccum = mix(colorAccum, sample, sample.a);
+                        } else if (blendMode == 2) { // Máximo
+                            colorAccum = max(colorAccum, sample);
+                        }
+
+                        currentPos += rayStep * invSize;
+                    }
+
+                    gl_FragColor = colorAccum;
+                }
+            `,
+            transparent: true,
+            depthWrite: false
+        });
+
+        // Geometría del volumen (cubo contenedor)
+        const volumeGeometry = new THREE.BoxGeometry(2, 2, 2);
+        const volumeMesh = new THREE.Mesh(volumeGeometry, volumeMaterial);
+        scene.add(volumeMesh);
+
+        camera.position.z = 4;
+
+        // Controles
+        document.getElementById('blendMode').addEventListener('change', (e) => {
+            const modes = { additive: 0, alpha: 1, maximum: 2 };
+            volumeMaterial.uniforms.blendMode.value = modes[e.target.value];
+        });
+
+        document.getElementById('density').addEventListener('input', (e) => {
+            volumeMaterial.uniforms.density.value = parseFloat(e.target.value);
+        });
+
+        document.getElementById('stepCount').addEventListener('input', (e) => {
+            volumeMaterial.uniforms.stepCount.value = parseInt(e.target.value);
+        });
+
+        // Animación
+        function animate() {
+            requestAnimationFrame(animate);
+            volumeMesh.rotation.x += 0.005;
+            volumeMesh.rotation.y += 0.01;
+            volumeMaterial.uniforms.cameraPosition.value = camera.position;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Ajustar tamaño con ventana
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
