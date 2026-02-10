@@ -2,31 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volume Shader BM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Volume Shader BM - Multi-Device</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { overflow: hidden; background: #111; }
-        #controls { 
-            position: absolute; 
-            top: 10px; 
-            left: 10px; 
-            background: rgba(0,0,0,0.7); 
-            padding: 15px; 
-            border-radius: 8px; 
-            color: white; 
-            font-family: Arial, sans-serif; 
+        body { 
+            overflow: hidden; 
+            background: #0a0a0a; 
+            touch-action: none; /* Evita zoom accidental en móviles */
+        }
+        #controls-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            background: rgba(0,0,0,0.8);
             z-index: 100;
         }
-        .control-group { margin: 10px 0; }
-        label { display: block; margin-bottom: 5px; font-size: 12px; }
-        input, select { width: 180px; padding: 5px; border: none; border-radius: 4px; }
-        canvas { display: block; }
+        .control-group {
+            min-width: 180px;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        select, input[type="range"] {
+            width: 100%;
+            padding: 5px;
+            border: none;
+            border-radius: 4px;
+            background: #222;
+            color: white;
+            font-size: 14px;
+        }
+        select {
+            cursor: pointer;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        /* Ajustes para móviles pequeños */
+        @media (max-width: 480px) {
+            #controls-container {
+                flex-direction: column;
+                padding: 5px;
+            }
+            .control-group {
+                min-width: auto;
+                margin: 0 5px;
+            }
+            label {
+                font-size: 11px;
+            }
+        }
     </style>
+    <!-- Carga Three.js de forma compatible -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 </head>
 <body>
-    <div id="controls">
+    <div id="controls-container">
         <div class="control-group">
             <label for="blendMode">Blending Mode (BM)</label>
             <select id="blendMode">
@@ -34,6 +79,231 @@
                 <option value="alpha">Alpha Blend</option>
                 <option value="maximum">Maximum</option>
             </select>
+        </div>
+        <div class="control-group">
+            <label for="density">Volume Density</label>
+            <input type="range" id="density" min="0.1" max="1.5" step="0.1" value="0.7">
+        </div>
+        <div class="control-group">
+            <label for="stepCount">Quality (Sampling Steps)</label>
+            <input type="range" id="stepCount" min="10" max="100" step="5" value="30">
+        </div>
+        <div class="control-group">
+            <label for="volumeShape">Volume Shape</label>
+            <select id="volumeShape">
+                <option value="cube">Cube</option>
+                <option value="sphere">Sphere</option>
+                <option value="noise">Noise</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        // Detectar dispositivo y ajustar configuración
+        const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const qualityFactor = isMobile ? 0.7 : 1;
+
+        // Configuración base
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: !isMobile, // Desactiva AA en móviles para velocidad
+            powerPreference: "low-power" // Optimiza para dispositivos con poca batería
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x0a0a0a);
+        renderer.sortObjects = false;
+        document.body.appendChild(renderer.domElement);
+
+        // Variables globales
+        let volumeTexture, volumeMaterial, volumeMesh;
+        let currentShape = "cube";
+
+        // Crear textura de volumen adaptable
+        function createVolumeTexture(shape = "cube") {
+            const size = isMobile ? 16 : 32;
+            const data = new Uint8Array(size * size * size * 4);
+
+            for (let z = 0; z < size; z++) {
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        const i = (x + y * size + z * size * size) * 4;
+                        const nx = x / size - 0.5;
+                        const ny = y / size - 0.5;
+                        const nz = z / size - 0.5;
+                        let opacity = 0;
+
+                        // Formas adaptables
+                        switch(shape) {
+                            case "sphere":
+                                opacity = Math.max(0, 1 - Math.sqrt(nx*nx + ny*ny + nz*nz) * 2);
+                                break;
+                            case "noise":
+                                const noise = Math.sin(x*3) * Math.cos(y*4) * Math.sin(z*3);
+                                opacity = Math.max(0, 0.5 + noise * 0.5);
+                                break;
+                            default: // cube
+                                opacity = (x > 2 && x < size-3 && y > 2 && y < size-3 && z > 2 && z < size-3) ? 0.8 : 0;
+                                break;
+                        }
+
+                        // Colores vibrantes pero compatibles
+                        data[i] = Math.floor(255 * (x / size));     // Rojo
+                        data[i+1] = Math.floor(255 * (y / size));   // Verde
+                        data[i+2] = Math.floor(255 * (z / size));   // Azul
+                        data[i+3] = Math.floor(255 * opacity);      // Opacidad
+                    }
+                }
+            }
+
+            const texture = new THREE.Data3DTexture(data, size, size, size);
+            texture.format = THREE.RGBAFormat;
+            texture.type = THREE.UnsignedByteType;
+            texture.minFilter = THREE.NearestFilter;
+            texture.magFilter = THREE.NearestFilter;
+            texture.unpackAlignment = 1;
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        // Crear material del volumen
+        function createVolumeMaterial() {
+            return new THREE.ShaderMaterial({
+                uniforms: {
+                    volumeTexture: { value: volumeTexture },
+                    blendMode: { value: 0 },
+                    density: { value: 0.7 },
+                    stepCount: { value: Math.floor(30 * qualityFactor) },
+                    invSize: { value: new THREE.Vector3(1/(isMobile ? 16 : 32), 1/(isMobile ? 16 : 32), 1/(isMobile ? 16 : 32)) },
+                    cameraPos: { value: camera.position }
+                },
+                vertexShader: `
+                    varying vec3 vPos;
+                    void main() {
+                        vPos = position;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform sampler3D volumeTexture;
+                    uniform int blendMode;
+                    uniform float density;
+                    uniform int stepCount;
+                    uniform vec3 invSize;
+                    uniform vec3 cameraPos;
+
+                    varying vec3 vPos;
+
+                    void main() {
+                        vec3 rayOrigin = cameraPos;
+                        vec3 rayDir = normalize(vPos - rayOrigin);
+                        vec3 rayStep = rayDir / float(stepCount) * 2.0;
+                        vec3 currPos = (vPos + 1.0) * 0.5;
+                        
+                        vec4 accum = vec4(0.0);
+
+                        for (int i = 0; i < stepCount; i++) {
+                            // Verificar límites y terminar temprano
+                            if (currPos.x < 0.0 || currPos.x > 1.0 || 
+                                currPos.y < 0.0 || currPos.y > 1.0 || 
+                                currPos.z < 0.0 || currPos.z > 1.0 ||
+                                accum.a > 0.99) break;
+
+                            vec4 samp = texture3D(volumeTexture, currPos);
+                            samp.a *= density;
+
+                            // Modos de mezcla compatibles
+                            if (blendMode == 0) { // Aditivo
+                                accum.rgb += samp.rgb * samp.a * (1.0 - accum.a);
+                                accum.a += samp.a * (1.0 - accum.a);
+                            } else if (blendMode == 1) { // Alpha
+                                accum = mix(accum, samp, samp.a);
+                            } else { // Máximo
+                                accum = max(accum, samp);
+                            }
+
+                            currPos += rayStep * invSize;
+                        }
+
+                        // Ajustar brillo para pantallas móviles
+                        gl_FragColor = vec4(accum.rgb * 1.2, accum.a);
+                    }
+                `,
+                transparent: true,
+                depthWrite: false,
+                depthTest: false
+            });
+        }
+
+        // Inicializar volumen
+        function initVolume() {
+            if (volumeMesh) scene.remove(volumeMesh);
+            volumeTexture = createVolumeTexture(currentShape);
+            volumeMaterial = createVolumeMaterial();
+            const geo = new THREE.BoxGeometry(2, 2, 2);
+            volumeMesh = new THREE.Mesh(geo, volumeMaterial);
+            scene.add(volumeMesh);
+        }
+
+        // Controles interactivos
+        document.getElementById('blendMode').addEventListener('change', (e) => {
+            const modes = { additive: 0, alpha: 1, maximum: 2 };
+            volumeMaterial.uniforms.blendMode.value = modes[e.target.value];
+        });
+
+        document.getElementById('density').addEventListener('input', (e) => {
+            volumeMaterial.uniforms.density.value = parseFloat(e.target.value);
+        });
+
+        document.getElementById('stepCount').addEventListener('input', (e) => {
+            volumeMaterial.uniforms.stepCount.value = parseInt(e.target.value);
+        });
+
+        document.getElementById('volumeShape').addEventListener('change', (e) => {
+            currentShape = e.target.value;
+            initVolume();
+        });
+
+        // Posición de la cámara
+        camera.position.set(0, 0, isMobile ? 5 : 4);
+
+        // Animación optimizada
+        let lastTime = 0;
+        function animate(time = 0) {
+            requestAnimationFrame(animate);
+            
+            // Controlar velocidad de animación en dispositivos lentos
+            const delta = (time - lastTime) / 1000;
+            if (delta > 0.05) {
+                lastTime = time;
+                if (volumeMesh) {
+                    volumeMesh.rotation.x += delta * 1.5;
+                    volumeMesh.rotation.y += delta * 2;
+                }
+                volumeMaterial.uniforms.cameraPos.value = camera.position;
+                renderer.render(scene, camera);
+            }
+        }
+
+        // Ajuste de tamaño automático
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Iniciar todo
+        initVolume();
+        animate();
+
+        // Manejar errores de WebGL
+        if (!renderer.capabilities.isWebGLAvailable()) {
+            document.body.innerHTML = "<div style='color:white; padding:20px; text-align:center;'>Tu dispositivo no soporta WebGL - necesitas un navegador más moderno para ver el shader.</div>";
+        }
+    </script>
+</body>
+</html>
         </div>
         <div class="control-group">
             <label for="density">Volume Density</label>
