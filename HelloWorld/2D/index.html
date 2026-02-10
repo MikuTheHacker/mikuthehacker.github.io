@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World - Infinite 2D Animation</title>
+    <style>
+        /* Reset and base setup */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: #0a0a1a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Animated background layers */
+        .background-grid {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: scrollGrid 45s linear infinite;
+        }
+
+        .background-waves {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.6;
+        }
+
+        .wave {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            border-radius: 45%;
+            background: linear-gradient(120deg, rgba(255, 0, 255, 0.2), rgba(0, 255, 255, 0.2));
+            animation: pulseWaves 20s ease-in-out infinite alternate;
+        }
+
+        .wave:nth-child(2) {
+            animation-delay: -5s;
+            background: linear-gradient(240deg, rgba(255, 255, 0, 0.2), rgba(255, 0, 0, 0.2));
+        }
+
+        .wave:nth-child(3) {
+            animation-delay: -10s;
+            background: linear-gradient(360deg, rgba(0, 255, 0, 0.2), rgba(0, 0, 255, 0.2));
+        }
+
+        /* Infinite moving particles */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: moveParticle calc(var(--duration, 20) * 1s) linear infinite,
+                       blinkParticle calc(var(--blink-duration, 8) * 1s) ease infinite alternate;
+            box-shadow: 0 0 8px var(--color, #fff);
+        }
+
+        /* "Hello World" main text */
+        .main-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .main-text span {
+            display: inline-block;
+            font-size: 8vw;
+            font-weight: 900;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            background-image: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+            background-size: 300% 100%;
+            animation: shiftTextGradient 5s linear infinite,
+                       bounceLetter calc(var(--bounce-duration, 2) * 1s) ease infinite alternate,
+                       skewLetter calc(var(--skew-duration, 3) * 1s) ease infinite alternate;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+        }
+
+        /* Animated geometric shapes */
+        .shape {
+            position: absolute;
+            animation: floatShape calc(var(--float-duration, 15) * 1s) ease infinite alternate,
+                       rotateShape calc(var(--spin-duration, 10) * 1s) linear infinite;
+            opacity: 0.7;
+        }
+
+        .square {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(45deg, #ff9800, #f44336);
+        }
+
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 60px solid transparent;
+            border-right: 60px solid transparent;
+            border-bottom: 100px solid #4caf50;
+        }
+
+        .circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2196f3, #9c27b0);
+        }
+
+        .hexagon {
+            width: 110px;
+            height: 63px;
+            background: linear-gradient(60deg, #e91e63, #673ab7);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+
+        /* 2D Animation Keyframes */
+        @keyframes scrollGrid {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-25%, -25%) rotate(1deg); }
+        }
+
+        @keyframes pulseWaves {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1.5); }
+        }
+
+        @keyframes moveParticle {
+            0% { 
+                top: 110%; 
+                left: var(--start-x, 0%); 
+                transform: scale(var(--start-size, 0.5));
+            }
+            100% { 
+                top: -10%; 
+                left: var(--end-x, 100%); 
+                transform: scale(var(--end-size, 1));
+            }
+        }
+
+        @keyframes blinkParticle {
+            0% { opacity: 0.2; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes shiftTextGradient {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 300% 0%; }
+        }
+
+        @keyframes bounceLetter {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-15px); }
+        }
+
+        @keyframes skewLetter {
+            0% { transform: skewX(0deg); }
+            50% { transform: skewX(5deg); }
+            100% { transform: skewX(-5deg); }
+        }
+
+        @keyframes floatShape {
+            0% { transform: translate(var(--x-start, 0), var(--y-start, 0)); }
+            100% { transform: translate(var(--x-end, 0), var(--y-end, 0)); }
+        }
+
+        @keyframes rotateShape {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-grid"></div>
+    <div class="background-waves">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+    <div class="particles" id="particles-container"></div>
+    
+    <div class="main-text">
+        <span style="--bounce-duration: 1.8; --skew-duration: 2.8;">H</span>
+        <span style="--bounce-duration: 2.1; --skew-duration: 3.2;">e</span>
+        <span style="--bounce-duration: 1.9; --skew-duration: 2.9;">l</span>
+        <span style="--bounce-duration: 2.3; --skew-duration: 3.4;">l</span>
+        <span style="--bounce-duration: 2.0; --skew-duration: 3.0;">o</span>
+        <span style="--bounce-duration: 2.5; --skew-duration: 3.6;"> </span>
+        <span style="--bounce-duration: 1.7; --skew-duration: 2.7;">W</span>
+        <span style="--bounce-duration: 2.2; --skew-duration: 3.3;">o</span>
+        <span style="--bounce-duration: 2.4; --skew-duration: 3.5;">r</span>
+        <span style="--bounce-duration: 1.6; --skew-duration: 2.6;">l</span>
+        <span style="--bounce-duration: 2.0; --skew-duration: 3.0;">d</span>
+    </div>
+
+    <div class="shape square" style="--float-duration: 12; --spin-duration: 8; --x-start: 15%; --y-start: 20%; --x-end: 20%; --y-end: 25%; top: 10%; left: 10%;"></div>
+    <div class="shape triangle" style="--float-duration: 18; --spin-duration: 12; --x-start: 85%; --y-start: 15%; --x-end: 80%; --y-end: 20%; top: 15%; left: 80%;"></div>
+    <div class="shape circle" style="--float-duration: 14; --spin-duration: 15; --x-start: 75%; --y-start: 75%; --x-end: 80%; --y-end: 70%; top: 65%; left: 70%;"></div>
+    <div class="shape hexagon" style="--float-duration: 16; --spin-duration: 9; --x-start: 20%; --y-start: 70%; --x-end: 15%; --y-end: 75%; top: 60%; left: 15%;"></div>
+
+    <script>
+        // Dynamic 2D particle generator
+        const particlesContainer = document.getElementById('particles-container');
+        const particlesAmount = 180;
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Random properties for unique motion
+            const duration = Math.random() * 35 + 10;
+            const blinkDuration = Math.random() * 12 + 4;
+            const startX = Math.random() * 100;
+            const endX = Math.random() * 100;
+            const size = Math.random() * 8 + 1;
+            const startSize = Math.random() * 0.5 + 0.3;
+            const endSize = Math.random() * 0.7 + 0.6;
+            const colors = ['#ff00ff', '#00ffff', '#ffff00', '#ff0000', '#00ff00', '#0000ff'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            // Apply custom variables
+            particle.style.setProperty('--duration', duration);
+            particle.style.setProperty('--blink-duration', blinkDuration);
+            particle.style.setProperty('--start-x', `${startX}%`);
+            particle.style.setProperty('--end-x', `${endX}%`);
+            particle.style.setProperty('--start-size', startSize);
+            particle.style.setProperty('--end-size', endSize);
+            particle.style.setProperty('--color', color);
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+
+            return particle;
+        }
+
+        // Initialize particles
+        for (let i = 0; i < particlesAmount; i++) {
+            particlesContainer.appendChild(createParticle());
+        }
+
+        // Refresh particles continuously
+        setInterval(() => {
+            const oldParticles = document.querySelectorAll('.particle');
+            const randomIndex = Math.floor(Math.random() * oldParticles.length);
+            particlesContainer.removeChild(oldParticles[randomIndex]);
+            particlesContainer.appendChild(createParticle());
+        }, 250);
+    </script>
+</body>
+  </html>
+                            
