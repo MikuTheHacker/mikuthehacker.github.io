@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HELLO WORLD - ULTRA CRASH EDITION</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100vh; overflow: hidden; background: #000; perspective: 2000px; }
+
+        /* HYBRID 2D+3D TOTAL CHAOS CONTAINER */
+        .total-chaos {
+            position: absolute;
+            width: 1000%;
+            height: 1000%;
+            top: -450%;
+            left: -450%;
+            transform-style: preserve-3d;
+            animation: spin-everything 10s linear infinite, scale-everything 5s ease infinite alternate;
+        }
+
+        /* STACKED BACKGROUND LAYERS (2D+3D) */
+        .bg-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform: translateZ(var(--z, -1000px));
+            animation: shift-layer calc(var(--speed, 20) * 1s) linear infinite, crazy-opacity calc(var(--opa-speed, 5) * 1s) ease infinite;
+            opacity: 0.2;
+        }
+
+        .grid-3d {
+            background: 
+                linear-gradient(rgba(255,0,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(rgba(255,255,0,0.05) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255,0,0,0.05) 2px, transparent 2px);
+            background-size: 10px 10px, 10px 10px, 30px 30px, 30px 30px;
+        }
+
+        .waves-2d {
+            background: conic-gradient(from var(--angle, 0deg), #ff00ff, #00ffff, #ffff00, #ff0000, #ff00ff);
+            background-size: 5% 5%;
+            filter: blur(5px);
+        }
+
+        .dots-mix {
+            background-image: radial-gradient(circle, var(--dot-color, #fff) 1px, transparent 1px);
+            background-size: 5px 5px;
+            transform: translateZ(var(--z, -500px)) rotateX(var(--rot-x, 0deg)) rotateY(var(--rot-y, 0deg));
+        }
+
+        /* MASSIVE PARTICLE FIELD (2D & 3D) */
+        .massive-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .particle {
+            position: absolute;
+            background: var(--p-color, #fff);
+            transform: translateZ(var(--p-z, 0px)) rotateX(var(--p-rotx, 0deg)) rotateY(var(--p-roty, 0deg)) rotateZ(var(--p-rotz, 0deg));
+            animation: 
+                move-particle calc(var(--p-speed, 10) * 1s) linear infinite,
+                rotate-particle calc(var(--p-rot-speed, 5) * 1s) linear infinite,
+                blink-particle calc(var(--p-blink-speed, 2) * 1s) step-end infinite,
+                scale-particle calc(var(--p-scale-speed, 3) * 1s) ease infinite alternate,
+                warp-particle calc(var(--p-warp-speed, 4) * 1s) ease infinite alternate;
+            box-shadow: 0 0 15px var(--p-color, #fff), 0 0 30px var(--p-color, #fff), 0 0 45px var(--p-color, #fff);
+            filter: brightness(calc(var(--p-bright, 1) + 0.5));
+        }
+
+        .particle.square { border-radius: 0; }
+        .particle.triangle { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        .particle.star { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+        .particle.hex { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
+
+        /* MAIN TEXT (HYBRID 2D+3D) */
+        .hello-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transform-style: preserve-3d;
+            z-index: 10;
+        }
+
+        .hello-text span {
+            display: inline-block;
+            font-size: 10vw;
+            font-weight: 900;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            background-image: linear-gradient(90deg, var(--t-c1), var(--t-c2), var(--t-c3), var(--t-c4), var(--t-c1));
+            background-size: 1000% 100%;
+            transform: translateZ(var(--t-z, 100px)) rotateX(var(--t-rotx, 0deg)) rotateY(var(--t-roty, 0deg));
+            animation: 
+                shift-text 1s linear infinite,
+                jitter-text 0.1s ease infinite,
+                spin-text 3s linear infinite,
+                float-text 0.8s ease infinite alternate,
+                glow-text 1.5s ease infinite alternate;
+            text-shadow: 0 0 20px var(--t-glow), 0 0 40px var(--t-glow), 0 0 60px var(--t-glow), 0 0 80px var(--t-glow);
+        }
+
+        /* GIANT SHAPES (2D+3D) */
+        .giant-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .giant-shape {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(45deg, var(--gs-c1), var(--gs-c2));
+            transform: translateZ(var(--gs-z, 200px)) rotateX(var(--gs-rotx, 0deg)) rotateY(var(--gs-roty, 0deg));
+            animation: 
+                wander-shape calc(var(--gs-speed, 30) * 1s) linear infinite,
+                spin-shape calc(var(--gs-rot-speed, 8) * 1s) linear infinite,
+                pulse-shape calc(var(--gs-pulse-speed, 2) * 1s) ease infinite alternate,
+                blur-shape calc(var(--gs-blur-speed, 5) * 1s) ease infinite alternate;
+            filter: blur(10px) contrast(200%);
+            opacity: 0.6;
+        }
+
+        /* INSANE INFINITE KEYFRAMES */
+        @keyframes spin-everything { 
+            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 
+            100% { transform: rotateX(360deg) rotateY(720deg) rotateZ(360deg); } 
+        }
+        @keyframes scale-everything { 
+            0% { transform: scale(1); } 
+            100% { transform: scale(1.5); } 
+        }
+        @keyframes shift-layer { 
+            0% { transform: translateZ(var(--z, -1000px)) translate(0,0); } 
+            100% { transform: translateZ(var(--z, -1000px)) translate(-10%, -8%); } 
+        }
+        @keyframes crazy-opacity { 
+            0%,100% { opacity: 0.1; } 
+            25% { opacity: 0.3; } 
+            50% { opacity: 0.5; } 
+            75% { opacity: 0.2; } 
+        }
+        @keyframes move-particle { 
+            0% { top: -50%; left: -50%; } 
+            25% { top: 150%; left: 50%; } 
+            50% { top: 50%; left: 150%; } 
+            75% { top: 150%; left: 150%; } 
+            100% { top: -50%; left: -50%; } 
+        }
+        @keyframes rotate-particle { 
+            0% { transform: translateZ(var(--p-z, 0px)) rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 
+            100% { transform: translateZ(var(--p-z, 0px)) rotateX(360deg) rotateY(720deg) rotateZ(1080deg); } 
+        }
+        @keyframes blink-particle { 
+            0%,10%,20%,30%,40%,50%,60%,70%,80%,90%,100% { opacity: calc(var(--p-opa, 0.5) + 0.5); } 
+            5%,15%,25%,35%,45%,55%,65%,75%,85%,95% { opacity: 0; } 
+        }
+        @keyframes scale-particle { 
+            0% { transform: scale(0.1); } 
+            100% { transform: scale(2); } 
+        }
+        @keyframes warp-particle { 
+            0% { transform: skewX(0deg) skewY(0deg); } 
+            25% { transform: skewX(20deg) skewY(10deg); } 
+            50% { transform: skewX(-20deg) skewY(-10deg); } 
+            75% { transform: skewX(10deg) skewY(20deg); } 
+            100% { transform: skewX(-10deg) skewY(-20deg); } 
+        }
+        @keyframes shift-text { 
+            0% { background-position: 0% 0%; } 
+            100% { background-position: 1000% 0%; } 
+        }
+        @keyframes jitter-text { 
+            0% { transform: translate(0px,0px); } 
+            25% { transform: translate(5px,-5px); } 
+            50% { transform: translate(-5px,5px); } 
+            75% { transform: translate(3px,-3px); } 
+            100% { transform: translate(-3px,3px); } 
+        }
+        @keyframes spin-text { 
+            0% { transform: translateZ(var(--t-z, 100px)) rotateX(0deg) rotateY(0deg); } 
+            100% { transform: translateZ(var(--t-z, 100px)) rotateX(360deg) rotateY(720deg); } 
+        }
+        @keyframes float-text { 
+            0% { transform: translateY(0px); } 
+            100% { transform: translateY(-30px); } 
+        }
+        @keyframes glow-text { 
+            0% { filter: brightness(1); } 
+            100% { filter: brightness(3); } 
+        }
+        @keyframes wander-shape { 
+            0% { top: 0%; left: 0%; } 
+            25% { top: 100%; left: 25%; } 
+            50% { top: 50%; left: 100%; } 
+            75% { top: 75%; left: 75%; } 
+            100% { top: 0%; left: 0%; } 
+        }
+        @keyframes spin-shape { 
+            0% { transform: translateZ(var(--gs-z, 200px)) rotateX(0deg) rotateY(0deg); } 
+            100% { transform: translateZ(var(--gs-z, 200px)) rotateX(360deg) rotateY(360deg); } 
+        }
+        @keyframes pulse-shape { 
+            0% { transform: scale(0.5); } 
+            100% { transform: scale(1.5); } 
+        }
+        @keyframes blur-shape { 
+            0% { filter: blur(5px) contrast(150%); } 
+            100% { filter: blur(15px) contrast(300%); } 
+        }
+    </style>
+</head>
+<body>
+    <div class="total-chaos">
+        <!-- 20 STACKED BACKGROUND LAYERS -->
+        <div class="bg-layer grid-3d" style="--z: -2000px; --speed: 15; --opa-speed: 3;"></div>
+        <div class="bg-layer waves-2d" style="--z: -1800px; --speed: 12; --opa-speed: 4; --angle: 45deg;"></div>
+        <div class="bg-layer dots-mix" style="--z: -1600px; --speed: 18; --opa-speed: 2; --dot-color: #ff00ff; --rot-x: 30deg; --rot-y: 45deg;"></div>
+        <div class="bg-layer grid-3d" style="--z: -1400px; --speed: 9; --opa-speed: 5; --angle: 90deg;"></div>
+        <div class="bg-layer waves-2d" style="--z: -1200px; --speed: 21; --opa-speed: 1; --angle: 135deg;"></div>
+        <div class="bg-layer dots-mix" style="--z: -1000px; --speed: 7; --opa-speed: 6; --dot-color: #00ffff; --rot-x: 60deg; --rot-y: 30deg;"></div>
+        <div class="bg-layer grid-3d" style="--z: -800px; --speed: 19; --opa-speed: 2; --angle: 180deg;"></div>
+        <div class="bg-layer waves-2d" style="--z: -600px; --speed: 14; --opa-speed: 3; --angle: 225deg;"></div>
+        <div class="bg-layer dots-mix" style="--z: -400px; --speed: 23; --opa-speed: 4; --dot-color: #ffff00; --rot-x: 90deg; --rot-y: 60deg;"></div>
+        <div class="bg-layer grid-3d" style="--z: -200px; --speed: 11; --opa-speed: 5; --angle: 270deg;"></div>
+        <div class="bg-layer waves-2d" style="--z: 0px; --speed: 8; --opa-speed: 1; --angle: 315deg;"></div>
+        <div class="bg-layer dots-mix" style="--z: 200px; --speed: 16; --opa-speed: 6; --dot-color: #ff0000; --rot-x: 120deg; --rot-y: 90deg;"></div>
+        <div class="bg-layer grid-3d" style="--z: 400px; --speed: 20; --opa-speed: 2; --angle: 360deg;"></div>
+        <div class="bg-layer waves-2d" style="--z: 600px; --
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transform-style: preserve-3d;
+            z-index: 10;
+        }
+
+        .texto-hell span {
+            display: inline-block;
+            font-size: 10vw;
+            font-weight: 900;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            background-image: linear-gradient(90deg, var(--t-c1), var(--t-c2), var(--t-c3), var(--t-c4), var(--t-c1));
+            background-size: 1000% 100%;
+            transform: translateZ(var(--t-z, 100px)) rotateX(var(--t-rotx, 0deg)) rotateY(var(--t-roty, 0deg));
+            animation: 
+                desplazar-texto 1s linear infinite,
+                vibrar-texto 0.1s ease infinite,
+                girar-texto 3s linear infinite,
+                flotar-texto 0.8s ease infinite alternate,
+                brillar-texto 1.5s ease infinite alternate;
+            text-shadow: 0 0 20px var(--t-glow), 0 0 40px var(--t-glow), 0 0 60px var(--t-glow), 0 0 80px var(--t-glow);
+        }
+
+        /* FORMAS GIGANTES (2D+3D) */
+        .formas-gigantes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .forma-gigante {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(45deg, var(--fg-c1), var(--fg-c2));
+            transform: translateZ(var(--fg-z, 200px)) rotateX(var(--fg-rotx, 0deg)) rotateY(var(--fg-roty, 0deg));
+            animation: 
+                deambular-forma calc(var(--fg-vel, 30) * 1s) linear infinite,
+                girar-forma calc(var(--fg-rot, 8) * 1s) linear infinite,
+                pulsar-forma calc(var(--fg-pul, 2) * 1s) ease infinite alternate,
+                difuminar-forma calc(var(--fg-dif, 5) * 1s) ease infinite alternate;
+            filter: blur(10px) contrast(200%);
+            opacity: 0.6;
+        }
+
+        /* KEYFRAMES INFINITOS Y COMPLEJOS */
+        @keyframes girar-todo { 0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 100% { transform: rotateX(360deg) rotateY(720deg) rotateZ(360deg); } }
+        @keyframes escalar-todo { 0% { transform: scale(1); } 100% { transform: scale(1.5); } }
+        @keyframes desplazar-capa { 0% { transform: translateZ(var(--z, -1000px)) translate(0,0); } 100% { transform: translateZ(var(--z, -1000px)) translate(-10%, -8%); } }
+        @keyframes opacidad-loca { 0%,100% { opacity: 0.1; } 25% { opacity: 0.3; } 50% { opacity: 0.5; } 75% { opacity: 0.2; } }
+        @keyframes mover-particula { 0% { top: -50%; left: -50%; } 25% { top: 150%; left: 50%; } 50% { top: 50%; left: 150%; } 75% { top: 150%; left: 150%; } 100% { top: -50%; left: -50%; } }
+        @keyframes rotar-particula { 0% { transform: translateZ(var(--p-z, 0px)) rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 100% { transform: translateZ(var(--p-z, 0px)) rotateX(360deg) rotateY(720deg) rotateZ(1080deg); } }
+        @keyframes parpadear-particula { 0%,10%,20%,30%,40%,50%,60%,70%,80%,90%,100% { opacity: calc(var(--p-opa, 0.5) + 0.5); } 5%,15%,25%,35%,45%,55%,65%,75%,85%,95% { opacity: 0; } }
+        @keyframes escalar-particula { 0% { transform: scale(0.1); } 100% { transform: scale(2); } }
+        @keyframes deformar-particula { 0% { transform: skewX(0deg) skewY(0deg); } 25% { transform: skewX(20deg) skewY(10deg); } 50% { transform: skewX(-20deg) skewY(-10deg); } 75% { transform: skewX(10deg) skewY(20deg); } 100% { transform: skewX(-10deg) skewY(-20deg); } }
+        @keyframes desplazar-texto { 0% { background-position: 0% 0%; } 100% { background-position: 1000% 0%; } }
+        @keyframes vibrar-texto { 0% { transform: translate(0px,0px); } 25% { transform: translate(5px,-5px); } 50% { transform: translate(-5px,5px); } 75% { transform: translate(3px,-3px); } 100% { transform: translate(-3px,3px); } }
+        @keyframes girar-texto { 0% { transform: translateZ(var(--t-z, 100px)) rotateX(0deg) rotateY(0deg); } 100% { transform: translateZ(var(--t-z, 100px)) rotateX(360deg) rotateY(720deg); } }
+        @keyframes flotar-texto { 0% { transform: translateY(0px); } 100% { transform: translateY(-30px); } }
+        @keyframes brillar-texto { 0% { filter: brightness(1); } 100% { filter: brightness(3); } }
+        @keyframes deambular-forma { 0% { top: 0%; left: 0%; } 25% { top: 100%; left: 25%; } 50% { top: 50%; left: 100%; } 75% { top: 75%; left: 75%; } 100% { top: 0%; left: 0%; } }
+        @keyframes girar-forma { 0% { transform: translateZ(var(--fg-z, 200px)) rotateX(0deg) rotateY(0deg); } 100% { transform: translateZ(var(--fg-z, 200px)) rotateX(360deg) rotateY(360deg); } }
+        @keyframes pulsar-forma { 0% { transform: scale(0.5); } 100% { transform: scale(1.5); } }
+        @keyframes difuminar-forma { 0% { filter: blur(5px) contrast(150%); } 100% { filter: blur(15px) contrast(300%); } }
+    </style>
+</head>
+<body>
+    <div class="caos-total">
+        <!-- 20 CAPAS DE FONDO -->
+        <div class="capa-bg grid-3d" style="--z: -2000px; --vel: 15; --opa: 3;"></div>
+        <div class="capa-bg olas-2d" style="--z: -1800px; --vel: 12; --opa: 4; --ang: 45deg;"></div>
+        <div class="capa-bg puntos-mix" style="--z: -1600px; --vel: 18; --opa: 2; --col: #ff00ff; --rotx: 30deg; --roty: 45deg;"></div>
+        <div class="capa-bg grid-3d" style="--z: -1400px; --vel: 9; --opa: 5; --ang: 90deg;"></div>
+        <div class="capa-bg olas-2d" style="--z: -1200px; --vel: 21; --opa: 1; --ang: 135deg;"></div>
+        <div class="capa-bg puntos-mix" style="--z: -1000px; --vel: 7; --opa: 6; --col: #00ffff; --rotx: 60deg; --roty: 30deg;"></div>
+        <div class="capa-bg grid-3d" style="--z: -800px; --vel: 19; --opa: 2; --ang: 180deg;"></div>
+        <div class="capa-bg olas-2d" style="--z: -600px; --vel: 14; --opa: 3; --ang: 225deg;"></div>
+        <div class="capa-bg puntos-mix" style="--z: -400px; --vel: 23; --opa: 4; --col: #ffff00; --rotx: 90deg; --roty: 60deg;"></div>
+        <div class="capa-bg grid-3d" style="--z: -200px; --vel: 11; --opa: 5; --ang: 270deg;"></div>
+        <div class="capa-bg olas-2d" style="--z: 0px; --vel: 8; --opa: 1; --ang: 315deg;"></div>
+        <div class="capa-bg puntos-mix" style="--z: 200px; --vel: 16; --opa: 6; --col: #ff0000; --rotx: 120deg; --roty: 90deg;"></div>
+        <div class="capa-bg grid-3d" style="--z: 400px; --vel: 20; --opa: 2; --ang: 360deg;"></div>
+        <div class="capa-bg olas-2d" style="--z: 600px; --vel: 13; --opa: 3; --ang: 45deg;"></div>
+        <div class="capa-bg puntos-mix" style="--z:
+        
