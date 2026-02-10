@@ -26,7 +26,7 @@
             animation: spin-mega 5s linear infinite, pulse-mega 2s ease infinite alternate;
         }
 
-        /* 50 STACKED BACKGROUND LAYERS (2D+3D) */
+        /* 50 BACKGROUND LAYERS */
         .bg-layer {
             position: absolute;
             width: 100%;
@@ -34,6 +34,151 @@
             transform: translateZ(var(--z, -5000px)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
             animation: slide-layer calc(var(--s, 10) * 1s) linear infinite, flicker-opa calc(var(--f, 2) * 1s) ease infinite;
             opacity: calc(var(--o, 0.1) + 0.1);
+        }
+
+        .grid-3d {
+            background: 
+                linear-gradient(rgba(255,0,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(rgba(255,255,0,0.08) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255,0,0,0.08) 2px, transparent 2px);
+            background-size: 5px 5px, 5px 5px, 15px 15px, 15px 15px;
+        }
+
+        .stripes-2d {
+            background: repeating-linear-gradient(
+                var(--a, 0deg),
+                var(--c1, #ff00ff) 0px,
+                var(--c2, #000) 5px,
+                var(--c3, #00ffff) 6px,
+                var(--c4, #000) 10px
+            );
+            background-size: 20px 20px;
+            filter: blur(2px);
+        }
+
+        /* 10,000+ PARTICLES */
+        .particle-ocean {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .particle {
+            position: absolute;
+            background: var(--p-col, #fff);
+            transform: translateZ(var(--p-z, 0px)) rotateX(var(--p-rx, 0deg)) rotateY(var(--p-ry, 0deg));
+            animation: dash-particle calc(var(--p-s, 5) * 1s) linear infinite, spin-particle calc(var(--p-r, 3) * 1s) linear infinite;
+            box-shadow: 0 0 15px var(--p-col, #fff);
+        }
+
+        /* FULL "HELLO WORLD" TEXT - 2D+3D */
+        .hello-world-full {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transform-style: preserve-3d;
+            z-index: 50;
+        }
+
+        .hello-world-full span {
+            display: inline-block;
+            font-size: 10vw;
+            font-weight: 900;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            background-image: linear-gradient(90deg, #ff00ff, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
+            background-size: 3000% 100%;
+            transform: translateZ(var(--t-z, 200px)) rotateX(var(--t-rx, 0deg)) rotateY(var(--t-ry, 0deg));
+            animation: 
+                text-sweep 1s linear infinite,
+                text-shake 0.05s ease infinite,
+                text-spin 3s linear infinite,
+                text-glow 0.8s ease infinite alternate;
+            text-shadow: 0 0 20px #fff, 0 0 40px #ff00ff, 0 0 60px #00ffff;
+        }
+
+        /* KEYFRAMES */
+        @keyframes spin-mega { 0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); } 100% { transform: rotateX(720deg) rotateY(1440deg) rotateZ(360deg); } }
+        @keyframes pulse-mega { 0% { transform: scale(1); } 100% { transform: scale(2); } }
+        @keyframes slide-layer { 0% { transform: translateZ(var(--z, -5000px)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate(0,0); } 100% { transform: translateZ(var(--z, -5000px)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate(-5%, -3%); } }
+        @keyframes flicker-opa { 0%,100% { opacity: 0.1; } 50% { opacity: 0.3; } }
+        @keyframes dash-particle { 0% { top: -100%; left: -100%; } 100% { top: 200%; left: 200%; } }
+        @keyframes spin-particle { 0% { transform: rotateX(0deg) rotateY(0deg); } 100% { transform: rotateX(360deg) rotateY(720deg); } }
+        @keyframes text-sweep { 0% { background-position: 0% 0%; } 100% { background-position: 3000% 0%; } }
+        @keyframes text-shake { 0% { transform: translate(0px,0px); } 25% { transform: translate(5px,-5px); } 50% { transform: translate(-5px,5px); } 75% { transform: translate(3px,-3px); } 100% { transform: translate(-3px,3px); } }
+        @keyframes text-spin { 0% { transform: translateZ(var(--t-z, 200px)) rotateX(0deg) rotateY(0deg); } 100% { transform: translateZ(var(--t-z, 200px)) rotateX(360deg) rotateY(720deg); } }
+        @keyframes text-glow { 0% { filter: brightness(1); } 100% { filter: brightness(5); } }
+    </style>
+</head>
+<body>
+    <div class="mega-hybrid">
+        <!-- BACKGROUND LAYERS -->
+        <div class="bg-layer grid-3d" style="--z: -10000px; --s: 5; --f: 1; --o: 0.05; --rx: 5deg; --ry: 10deg;"></div>
+        <div class="bg-layer stripes-2d" style="--z: -9800px; --s: 6; --f: 1.5; --o: 0.1; --a: 15deg; --c1: #ff0000; --c3: #ffff00;"></div>
+        <div class="bg-layer grid-3d" style="--z: -9600px; --s: 7; --f: 2; --o: 0.15; --rx: 15deg; --ry: 5deg;"></div>
+        <div class="bg-layer stripes-2d" style="--z: -9400px; --s: 8; --f: 2.5; --o: 0.2; --a: 30deg; --c1: #00ff00; --c3: #00ffff;"></div>
+        <div class="bg-layer grid-3d" style="--z: -9200px; --s: 9; --f: 1.8; --o: 0.2; --rx: 20deg; --ry: 10deg;"></div>
+        <div class="bg-layer stripes-2d" style="--z: -9000px; --s: 10; --f: 2; --o: 0.25; --a: 45deg; --c1: #00ffff; --c3: #ff00ff;"></div>
+        <div class="bg-layer grid-3d" style="--z: -8800px; --s: 11; --f: 2.2; --o: 0.3; --rx: 25deg; --ry: 15deg;"></div>
+        <div class="bg-layer stripes-2d" style="--z: -8600px; --s: 12; --f: 2.5; --o: 0.3; --a: 60deg; --c1: #0000ff; --c3: #ff00ff;"></div>
+        <div class="bg-layer grid-3d" style="--z: -8400px; --s: 13; --f: 2.8; --o: 0.35; --rx: 30deg; --ry: 20deg;"></div>
+        <div class="bg-layer stripes-2d" style="--z: -8200px; --s: 14; --f: 3; --o: 0.4; --a: 75deg; --c1: #ff00ff; --c3: #00ff00;"></div>
+
+        <!-- MORE BACKGROUND LAYERS -->
+        <div class="bg-layer grid-3d" style="--z: -8000px; --s: 15; --f: 3.2; --o: 0.45; --rx: 35deg; --ry: 25deg;"></div>
+        <div class="bg-layer stripes-2d" style="--z: -7800px; --s: 16; --f: 3.5; --o: 0.5; --a: 90deg; --c1: #ffff00; --c3: #ff0000;"></div>
+        <div class="bg-layer grid-3d" style="--z: -7600px; --s: 17; --f: 3.8; --o: 0.55; --rx: 40deg; --ry: 30deg;"></div>
+        <div class="bg-layer stripes-2d" style="--z: -7400px; --s: 18; --f: 4; --o: 0.6; --a: 105deg; --c1: #ff0000; --c3: #00ff00;"></div>
+        <div class="bg-layer grid-3d" style="--z: -7200px; --s: 19; --f: 4.2; --o: 0.65; --rx: 45deg; --ry: 35deg;"></div>
+        <div class="bg-layer stripes-2d" style="--z: -7000px; --s: 20; --f: 4.5; --o: 0.7; --a: 120deg; --c1: #00ff00; --c3: #0000ff;"></div>
+        <div class="bg-layer grid-3d" style="--z: -6800px; --s: 21; --f: 4.8; --o: 0.75; --rx: 50deg; --ry: 40deg;"></div>
+        <div class="bg-layer stripes-2d" style="--z: -6600px; --s: 22; --f: 5; --o: 0.8; --a: 135deg; --c1: #0000ff; --c3: #ff00ff;"></div>
+        <div class="bg-layer grid-3d" style="--z: -6400px; --s: 23; --f: 5.2; --o: 0.85; --rx: 55deg; --ry: 45deg;"></div>
+
+        <!-- PARTICLE OCEAN -->
+        <div class="particle-ocean">
+            <script>
+                // GENERATE 15,000 PARTICLES
+                for(let i=0; i<15000; i++){
+                    let p = document.createElement('div');
+                    p.className = 'particle';
+                    let size = Math.random()*10 + 1;
+                    let z = Math.random()*-5000 - 1000;
+                    let rx = Math.random()*360;
+                    let ry = Math.random()*360;
+                    let speed = Math.random()*10 + 3;
+                    let col = ['#ff00ff','#ff0000','#ffff00','#00ff00','#00ffff','#0000ff'][Math.floor(Math.random()*6)];
+                    p.style.width = size+'px';
+                    p.style.height = size+'px';
+                    p.style.setProperty('--p-z', z+'px');
+                    p.style.setProperty('--p-rx', rx+'deg');
+                    p.style.setProperty('--p-ry', ry+'deg');
+                    p.style.setProperty('--p-s', speed+'');
+                    p.style.setProperty('--p-col', col);
+                    document.querySelector('.particle-ocean').appendChild(p);
+                }
+            </script>
+        </div>
+    </div>
+
+    <!-- FULL "HELLO WORLD" TEXT -->
+    <div class="hello-world-full">
+        <div class="hello-world-full">
+            <span style="--t-z: 200px; --t-rx: 10deg; --t-ry: 5deg;">H</span>
+            <span style="--t-z: 220px; --t-rx: 15deg; --t-ry: 10deg;">E</span>
+            <span style="--t-z: 240px; --t-rx: 20deg; --t-ry: 15deg;">L</span>
+            <span style="--t-z: 260px; --t-rx: 25deg; --t-ry: 20deg;">L</span>
+            <span style="--t-z: 280px; --t-rx: 30deg; --t-ry: 25deg;">O</span>
+            <span style="--t-z: 300px; --t-rx: 35deg; --t-ry: 30deg;"> </span>
+            <span style="--t-z: 320px; --t-rx: 40deg; --t-ry: 35deg;">W</span>
+            <span style="--t-z: 340px; --t-rx: 45deg; --t-ry: 40deg;">O</span>
+            <span style="--t-z: 360px; --t-rx: 50deg; --t-ry: 45deg;">R</span>
+            <span style="--t-z: 380px; --t-rx: 55deg; --t-ry: 50deg;">L</span>
+            <span style="--t-z: 400px; --t-rx: 60deg; --t-ry: 55deg;">D</span
         }
 
         .grid-3d {
