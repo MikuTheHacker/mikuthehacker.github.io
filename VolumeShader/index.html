@@ -2,38 +2,257 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>VolumeShader</title>
+    <title>VOLUME SHADER - WITH INTENTIONAL LAG</title>
     <style>
         body { margin: 0; background: #000; overflow: hidden; }
         canvas { display: block; }
-        #info { position: absolute; top: 10px; left: 10px; color: white; font-family: monospace; font-size: 12px; }
+        #controls {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.85);
+            padding: 20px;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .control-group { margin: 15px 0; }
+        label { display: block; font-size: 14px; margin-bottom: 8px; }
+        input { width: 220px; padding: 5px; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 </head>
 <body>
-    <div id="info">VOLUME SHADER - CON LAG INTENCIONAL</div>
+    <div id="controls">
+        <h2>VOLUME SHADER SETTINGS</h2>
+        <div class="control-group">
+            <label>VOLUME RESOLUTION (HIGHER = MORE LAG)</label>
+            <input type="range" id="resolution" min="32" max="128" step="16" value="128">
+        </div>
+        <div class="control-group">
+            <label>RENDER STEPS (MORE = MORE LAG)</label>
+            <input type="range" id="steps" min="50" max="300" step="25" value="300">
+        </div>
+        <div class="control-group">
+            <label>FRAME DELAY (MS)</label>
+            <input type="range" id="delay" min="0" max="100" step="5" value="60">
+        </div>
+    </div>
+
     <script>
+        // INITIALIZE THREE.JS COMPONENTS
         const renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 100);
-        camera.position.z = 5;
+        camera.position.z = 6;
 
-        // VOLUMEN GRANDE PARA GENERAR LAG
-        const SIZE = 128;
-        const data = new Uint8Array(SIZE * SIZE * SIZE * 4);
-        for(let i = 0; i < data.length; i += 4) {
-            const x = (i/4) % SIZE;
-            const y = Math.floor((i/4)/SIZE) % SIZE;
-            const z = Math.floor((i/4)/(SIZE*SIZE));
+        // GLOBAL VARIABLES
+        let volumeMesh;
+        let volumeTexture;
+        let currentRes = 128;
+        let currentSteps = 300;
+        let currentDelay = 60;
+
+        // CREATE LAGGY VOLUME DATA
+        function createHighLagVolume(res) {
+            const data = new Uint8Array(res * res * res * 4);
             
-            // Cálculos pesados e innecesarios para generar lag
-            let val = 0;
-            for(let j = 0; j < 100; j++) val += Math.sin(x*j + y*j + z*j);
+            // HEAVY CALCULATIONS TO WASTE PROCESSOR POWER
+            for(let i = 0; i < data.length; i += 4) {
+                const x = (i/4) % res;
+                const y = Math.floor((i/4)/res) % res;
+                const z = Math.floor((i/4)/(res*res));
+
+                let dummyValue = 0;
+                // REDUNDANT LOOP TO SLOW THINGS DOWN
+                for(let j = 0; j < 300; j++) {
+                    dummyValue += Math.sin(x*j + y*j + z*j) * Math.tan(x*j - z*j);
+                }
+
+                data[i] = Math.abs(dummyValue * 20);
+                data[i+1] = Math.abs(dummyValue * 10);
+                data[i+2] = Math.abs(dummyValue * 25);
+                data[i+3] = Math.abs(dummyValue * 5);
+            }
+            return data;
+        }
+
+        // SET UP VOLUME MATERIAL WITH LAGGY SHADER
+        function setupVolume(res, steps) {
+            if(volumeMesh) scene.remove(volumeMesh);
             
-            data[i] = Math.abs(val * 10);
+            const volData = createHighLagVolume(res);
+            volumeTexture = new THREE.Data3DTexture(volData, res, res, res);
+            volumeTexture.format = THREE.RGBAFormat;
+            volumeTexture.needsUpdate = true;
+
+            const laggyMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    volume: { value: volumeTexture },
+                    renderSteps: { value: steps },
+                    time: { value: 0 }
+                },
+                vertexShader: `
+                    varying vec3 vPosition;
+                    void main() {
+                        vPosition = position;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform sampler3D volume;
+                    uniform int renderSteps;
+                    uniform float time;
+                    varying vec3 vPosition;
+
+                    void main() {
+                        vec3 rayDir = normalize(vPosition - cameraPosition);
+                        vec3 pos = vPosition;
+                        vec4 finalColor = vec4(0);
+
+                        // EXTREMELY LONG LOOP TO CAUSE LAG
+                        for(int i = 0; i < renderSteps; i++) {
+                            vec3 texPos = (pos + 1.0) * 0.5;
+                            
+                            // ADDITIONAL CALCULATIONS TO WASTE TIME
+                            for(int j = 0; j < 150; j++) {
+                                texPos.x += sin(time * j + texPos.y);
+                                texPos.y += cos(time * j + texPos.z);
+                            }
+
+                            vec4 sample = texture3D(volume, texPos);
+                            finalColor.rgb += sample.rgb * sample.a * 0.005;
+                            pos += rayDir * 0.005;
+                        }
+                        gl_FragColor = finalColor;
+                    }
+                `
+            });
+
+            volumeMesh = new THREE.Mesh(new THREE.BoxGeometry(3, 3, 3), laggyMaterial);
+            scene.add(volumeMesh);
+        }
+
+        // UPDATE SETTINGS WHEN SLIDERS CHANGE
+        document.getElementById('resolution').addEventListener('input', function(e) {
+            currentRes = parseInt(e.target.value);
+            setupVolume(currentRes, currentSteps);
+        });
+
+        document.getElementById('steps').addEventListener('input', function(e) {
+            currentSteps = parseInt(e.target.value);
+            setupVolume(currentRes, currentSteps);
+        });
+
+        document.getElementById('delay').addEventListener('input', function(e) {
+            currentDelay = parseInt(e.target.value);
+        });
+
+        // ANIMATION LOOP WITH INTENTIONAL DELAYS
+        function animate() {
+            setTimeout(() => {
+                requestAnimationFrame(animate);
+                
+                // UPDATE TIME UNIFORM
+                if(laggyMaterial) laggyMaterial.uniforms.time.value += 0.005;
+                
+                // SLOW ROTATION TO SHOW LAG
+                volumeMesh.rotation.x += 0.0005;
+                volumeMesh.rotation.y += 0.001;
+                
+                renderer.render(scene, camera);
+            }, currentDelay);
+        }
+
+        // INITIAL SETUP
+        setupVolume(currentRes, currentSteps);
+        animate();
+    </script>
+</body>
+</html>
+            
+        function updateVolume() {
+            if(mesh) scene.remove(mesh);
+            const data = createHeavyVolume();
+            tex = new THREE.Data3DTexture(data, size, size, size);
+            tex.format = THREE.RGBAFormat;
+            tex.needsUpdate = true;
+
+            mat = new THREE.ShaderMaterial({
+                uniforms: { vol: { value: tex }, steps: { value: steps }, time: { value: 0 } },
+                vertexShader: `
+                    varying vec3 vP;
+                    void main() {
+                        vP = position;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform sampler3D vol;
+                    uniform int steps;
+                    uniform float time;
+                    varying vec3 vP;
+
+                    void main() {
+                        vec3 dir = normalize(vP - cameraPosition);
+                        vec3 pos = vP;
+                        vec4 col = vec4(0);
+
+                        // Bucle largo con calculos redundantes
+                        for(int i = 0; i < steps; i++) {
+                            vec3 tP = (pos + 1.0) * 0.5;
+                            for(int j = 0; j < 100; j++) {
+                                tP.x += sin(time * j + tP.y * j);
+                                tP.y += cos(time * j + tP.z * j);
+                                tP.z += sin(time * j + tP.x * j);
+                            }
+                            vec4 samp = texture3D(vol, tP);
+                            col += samp * 0.005;
+                            pos += dir * 0.005;
+                        }
+                        gl_FragColor = col;
+                    }
+                `
+            });
+
+            mesh = new THREE.Mesh(new THREE.BoxGeometry(2,2,2), mat);
+            scene.add(mesh);
+        }
+
+        // Eventos para aumentar lag
+        document.getElementById('size').addEventListener('input', e => {
+            size = parseInt(e.target.value);
+            updateVolume();
+        });
+        document.getElementById('steps').addEventListener('input', e => {
+            steps = parseInt(e.target.value);
+            if(mat) mat.uniforms.steps.value = steps;
+        });
+        document.getElementById('delay').addEventListener('input', e => {
+            delay = parseInt(e.target.value);
+        });
+
+        // Animacion con lag intencional
+        function animate() {
+            setTimeout(() => {
+                requestAnimationFrame(animate);
+                if(mat) mat.uniforms.time.value += 0.005;
+                if(mesh) {
+                    mesh.rotation.x += 0.0005;
+                    mesh.rotation.y += 0.001;
+                }
+                renderer.render(scene, camera);
+            }, delay);
+        }
+
+        updateVolume();
+        animate();
+    </script>
+</body>
+</html>
             data[i+1] = Math.abs(val * 5);
             data[i+2] = Math.abs(val * 15);
             data[i+3] = Math.abs(val * 2);
