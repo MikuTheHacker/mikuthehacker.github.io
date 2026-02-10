@@ -7,11 +7,30 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { overflow: hidden; background: #111; }
-        #controls { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 8px; color: white; font-family: Arial, sans-serif; }
+        #controls { 
+            position: absolute; 
+            top: 10px; 
+            left: 10px; 
+            background: rgba(0,0,0,0.7); 
+            padding: 15px; 
+            border-radius: 8px; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+            z-index: 100;
+        }
         .control-group { margin: 10px 0; }
         label { display: block; margin-bottom: 5px; font-size: 12px; }
         input, select { width: 180px; padding: 5px; border: none; border-radius: 4px; }
+        canvas { display: block; }
     </style>
+    <!-- Import Three.js via CDN (stable for GitHub Pages) -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js"
+            }
+        }
+    </script>
 </head>
 <body>
     <div id="controls">
@@ -25,15 +44,162 @@
         </div>
         <div class="control-group">
             <label for="density">Volume Density</label>
-            <input type="range" id="density" min="0.1" max="2" step="0.1" value="0.8">
+            <input type="range" id="density" min="0.1" max="1.5" step="0.1" value="0.6">
         </div>
         <div class="control-group">
             <label for="stepCount">Sampling Steps</label>
-            <input type="range" id="stepCount" min="20" max="200" step="10" value="80">
+            <input type="range" id="stepCount" min="20" max="120" step="10" value="40">
         </div>
     </div>
 
-    <script type="importmap">
+    <script type="module">
+        import * as THREE from 'three';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: false }); // Disable AA for speed
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Limit pixel ratio
+        document.body.appendChild(renderer.domElement);
+
+        // Optimized volume texture (32x32x32 = faster performance)
+        function createVolumeTexture() {
+            const size = 32;
+            const data = new Uint8Array(size * size * size * 4);
+            for (let z = 0; z < size; z++) {
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        const i = (x + y * size + z * size * size) * 4;
+                        // Sphere shape with noise
+                        const dx = x/size - 0.5;
+                        const dy = y/size - 0.5;
+                        const dz = z/size - 0.5;
+                        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                        const opacity = Math.max(0, 1 - dist * 2.2);
+                        // Simple color gradient
+                        data[i] = 180 * (x/size);     // Red
+                        data[i+1] = 220 * (y/size);   // Green
+                        data[i+2] = 255 * (z/size);   // Blue
+                        data[i+3] = 255 * opacity;    // Opacity
+                    }
+                }
+            }
+            const texture = new THREE.Data3DTexture(data, size, size, size);
+            texture.format = THREE.RGBAFormat;
+            texture.type = THREE.UnsignedByteType;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            texture.unpackAlignment = 1;
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        // Volume material with performance optimizations
+        const volumeTexture = createVolumeTexture();
+        const volumeMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                volumeTexture: { value: volumeTexture },
+                blendMode: { value: 0 },
+                density: { value: 0.6 },
+                stepCount: { value: 40 },
+                invSize: { value: new THREE.Vector3(1/32, 1/32, 1/32) },
+                cameraPos: { value: camera.position }
+            },
+            vertexShader: `
+                varying vec3 vPos;
+                void main() {
+                    vPos = position;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler3D volumeTexture;
+                uniform int blendMode;
+                uniform float density;
+                uniform int stepCount;
+                uniform vec3 invSize;
+                uniform vec3 cameraPos;
+
+                varying vec3 vPos;
+
+                void main() {
+                    vec3 rayOrigin = cameraPos;
+                    vec3 rayDir = normalize(vPos - rayOrigin);
+                    vec3 rayStep = rayDir / float(stepCount) * 2.0;
+                    vec3 currPos = (vPos + 1.0) * 0.5; // [0,1] range
+                    
+                    vec4 accum = vec4(0.0);
+
+                    for (int i = 0; i < stepCount; i++) {
+                        // Bounds check + early termination
+                        if (currPos.x < 0.0 || currPos.x > 1.0 || 
+                            currPos.y < 0.0 || currPos.y > 1.0 || 
+                            currPos.z < 0.0 || currPos.z > 1.0 ||
+                            accum.a > 0.98) break;
+
+                        vec4 samp = texture3D(volumeTexture, currPos);
+                        samp.a *= density;
+
+                        // Blending modes
+                        if (blendMode == 0) { // Additive
+                            accum += samp * (1.0 - accum.a);
+                        } else if (blendMode == 1) { // Alpha
+                            accum = mix(accum, samp, samp.a);
+                        } else { // Maximum
+                            accum = max(accum, samp);
+                        }
+
+                        currPos += rayStep * invSize;
+                    }
+
+                    gl_FragColor = accum;
+                }
+            `,
+            transparent: true,
+            depthWrite: false
+        });
+
+        // Volume mesh
+        const volumeGeo = new THREE.BoxGeometry(2, 2, 2);
+        const volumeMesh = new THREE.Mesh(volumeGeo, volumeMaterial);
+        scene.add(volumeMesh);
+
+        camera.position.z = 4;
+
+        // Controls logic
+        document.getElementById('blendMode').addEventListener('change', (e) => {
+            const modes = { additive: 0, alpha: 1, maximum: 2 };
+            volumeMaterial.uniforms.blendMode.value = modes[e.target.value];
+        });
+
+        document.getElementById('density').addEventListener('input', (e) => {
+            volumeMaterial.uniforms.density.value = parseFloat(e.target.value);
+        });
+
+        document.getElementById('stepCount').addEventListener('input', (e) => {
+            volumeMaterial.uniforms.stepCount.value = parseInt(e.target.value);
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            volumeMesh.rotation.x += 0.004;
+            volumeMesh.rotation.y += 0.008;
+            volumeMaterial.uniforms.cameraPos.value = camera.position;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
         {
             "imports": {
                 "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
