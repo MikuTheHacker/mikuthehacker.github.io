@@ -21,6 +21,7 @@
             background-size: 2px;
         }
 
+        /* Interferencia estática */
         body::before {
             content: '';
             position: fixed;
@@ -28,15 +29,18 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('https://cdn-icons-png.flaticon.com/512/3060/3060978.png'),
-                              url('https://cdn-icons-png.flaticon.com/512/4159/4159288.png');
-            background-size: 200px, 180px;
-            background-repeat: repeat, no-repeat;
-            background-position: 0 0, 80% 70%;
+            background: url('https://cdn-icons-png.flaticon.com/512/3060/3060978.png'),
+                        url('https://cdn-icons-png.flaticon.com/512/4159/4159288.png'),
+                        url('https://cdn-icons-png.flaticon.com/512/103/103524.png');
+            background-size: 200px, 180px, 5px;
+            background-repeat: repeat, no-repeat, repeat;
+            background-position: 0 0, 80% 70%, 0 0;
             opacity: 0.18;
             z-index: -2;
+            animation: staticFlicker 0.05s infinite alternate;
         }
 
+        /* Parpadeo intenso */
         body::after {
             content: '';
             position: fixed;
@@ -46,16 +50,17 @@
             height: 100%;
             background: rgba(0,0,0,0.7);
             z-index: -1;
-            animation: flicker 0.2s infinite alternate;
+            animation: flicker 0.1s infinite alternate;
         }
 
+        /* Cabecera deformada */
         .channel-header {
             padding: 20px;
             border-bottom: 4px solid #990000;
             background: rgba(0,0,0,0.95);
             display: flex;
             align-items: center;
-            animation: warp 12s infinite alternate;
+            animation: warp 8s infinite alternate;
         }
 
         .channel-avatar {
@@ -65,15 +70,17 @@
             background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png');
             background-size: cover;
             margin-right: 20px;
-            animation: shake 0.5s infinite alternate;
+            animation: shake 0.2s infinite alternate, rotateWeird 20s infinite linear;
         }
 
         .channel-name {
             font-size: 28px;
             color: #ff3333;
             letter-spacing: 3px;
+            animation: textGlitch 0.3s infinite alternate;
         }
 
+        /* Botón que se mueve */
         .back-btn {
             position: fixed;
             top: 20px;
@@ -82,7 +89,7 @@
             background: #990000;
             border: none;
             color: #000;
-            animation: shake 0.6s infinite alternate;
+            animation: moveBtn 5s infinite alternate, shake 0.6s infinite alternate;
             cursor: pointer;
             z-index: 10;
         }
@@ -92,14 +99,54 @@
             margin: 40px auto;
             padding: 20px;
             border: 2px solid #990000;
-            animation: deform 8s infinite alternate;
+            animation: deform 8s infinite alternate, moveContainer 15s infinite alternate;
+            position: relative;
         }
 
-        iframe {
+        /* Contenedor con glitch */
+        .video-wrapper {
             width: 100%;
             height: 500px;
             border: 2px solid #ff3333;
             background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            opacity: 0.95;
+            animation: videoGlitch 0.5s infinite alternate;
+        }
+
+        /* Capa de glitch sobre el video */
+        .glitch-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 5;
+            animation: glitchFlash 15s infinite;
+            display: none;
+        }
+
+        /* Susto oculto */
+        .jump-scare {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ff0000;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 999;
+            display: none;
         }
 
         .video-desc {
@@ -108,199 +155,10 @@
             border: 1px solid #990000;
             font-size: 14px;
             opacity: 0.8;
+            animation: textShake 0.5s infinite alternate;
         }
 
-        @keyframes flicker {
-            0% { background: rgba(0,0,0,0.65); }
-            100% { background: rgba(0,0,0,0.8); }
-        }
-
-        @keyframes warp {
-            0% { transform: skewX(0deg); }
-            100% { transform: skewX(2deg); }
-        }
-
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(2px); }
-        }
-
-        @keyframes deform {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.01); }
-        }
-
-        @media (max-width: 768px) {
-            iframe { height: 300px; }
-            .channel-name { font-size: 22px; }
-        }
-    </style>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/216/216788.png" type="image/x-icon">
-</head>
-<body>
-    <button class="back-btn" onclick="window.location.href='https://mikuthehacker.github.io/ytub'">← BACK TO YEWTOOB_98</button>
-
-    <div class="channel-header">
-        <div class="channel-avatar"></div>
-        <div class="channel-name">USERNAME: 666</div>
-    </div>
-
-    <main class="video-container">
-        <!-- VIDEO OFICIAL DE YOUTUBE (nana825763) -->
-        <iframe src="https://www.youtube.com/embed/6n3pFFPSlW4" title="Username: 666" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        
-        <div class="video-desc">
-            VIDEO OFICIAL ASOCIADO A "USERNAME: 666" • CREADO POR NANA825763 (PIROPITO) • SUBIDO A YOUTUBE EN 2008 • BASE DE LA LEYENDA URBANA DEL CANAL PERDIDO.
-        </div>
-    </main>
-
-    <script>
-        // MANOS FLOTANTES
-        setInterval(() => {
-            const hand = document.createElement('div');
-            hand.style.position = 'absolute';
-            hand.style.width = '90px';
-            hand.style.height = '120px';
-            hand.style.backgroundImage = 'url(https://cdn-icons-png.flaticon.com/512/4159/4159289.png)';
-            hand.style.backgroundSize = 'cover';
-            hand.style.opacity = '0.25';
-            hand.style.left = `${Math.random() * 100}%`;
-            hand.style.animation = `float ${20 + Math.random() * 15}s infinite linear`;
-            document.body.appendChild(hand);
-            setTimeout(() => hand.remove(), 30000);
-        }, 1500);
-
-        // ANIMACIÓN DE MANOS
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes float {
-                0% { top: -150px; transform: rotate(0deg); }
-                100% { top: 100vh; transform: rotate(360deg); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
-</body>
-</html>
-            background-position: 0 0, 80% 70%;
-            opacity: 0.18;
-            z-index: -2;
-        }
-
-        /* Capa parpadeante */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: -1;
-            animation: flicker 0.2s infinite alternate;
-        }
-
-        /* Cabecera del canal USERNAME: 666 */
-        .channel-header {
-            padding: 20px;
-            border-bottom: 4px solid #990000;
-            background: rgba(0,0,0,0.95);
-            display: flex;
-            align-items: center;
-            animation: warp 12s infinite alternate;
-        }
-
-        .channel-avatar {
-            width: 80px;
-            height: 80px;
-            border: 3px solid #990000;
-            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png');
-            background-size: cover;
-            margin-right: 20px;
-            animation: shake 0.5s infinite alternate;
-        }
-
-        .channel-info {
-            animation: shake 0.4s infinite alternate;
-        }
-
-        .channel-name {
-            font-size: 28px;
-            color: #ff3333;
-            letter-spacing: 3px;
-            margin-bottom: 5px;
-        }
-
-        .channel-desc {
-            font-size: 14px;
-            opacity: 0.7;
-        }
-
-        /* Contenedor de videos del canal */
-        .videos-container {
-            padding: 25px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            animation: shift 20s infinite alternate;
-        }
-
-        /* Cada video del canal USERNAME: 666 */
-        .video-card {
-            height: 200px;
-            border: 2px solid #990000;
-            position: relative;
-            animation: deform 8s infinite alternate, fadeIn 2s forwards;
-            opacity: 0;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .video-card:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 20px #ff3333;
-        }
-
-        /* Sangre en videos */
-        .video-card::before {
-            content: '';
-            position: absolute;
-            top: 5%;
-            left: 10%;
-            width: 80%;
-            height: 70%;
-            background-image: url('https://cdn-icons-png.flaticon.com/512/3060/3060982.png');
-            background-size: cover;
-            opacity: 0.4;
-            animation: drip 15s infinite alternate;
-        }
-
-        /* Título de cada video */
-        .video-card::after {
-            content: attr(data-title);
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            color: #ff3333;
-            font-size: 12px;
-            letter-spacing: 2px;
-        }
-
-        /* Botón volver */
-        .back-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 8px 15px;
-            background: #990000;
-            border: none;
-            color: #000;
-            animation: shake 0.6s infinite alternate;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        /* Manos flotantes */
+        /* MANOS FLOTANTES */
         .floating-hand {
             position: absolute;
             width: 90px;
@@ -311,40 +169,78 @@
             animation: float 25s infinite linear;
         }
 
-        /* Animaciones */
+        /* ANIMACIONES TERRORÍFICAS */
         @keyframes flicker {
             0% { background: rgba(0,0,0,0.65); }
+            50% { background: rgba(150,0,0,0.2); }
             100% { background: rgba(0,0,0,0.8); }
+        }
+
+        @keyframes staticFlicker {
+            0% { opacity: 0.15; }
+            100% { opacity: 0.22; }
         }
 
         @keyframes warp {
             0% { transform: skewX(0deg); }
-            100% { transform: skewX(2deg); }
+            100% { transform: skewX(5deg) scaleX(1.02); }
         }
 
         @keyframes shake {
             0% { transform: translateX(0); }
-            100% { transform: translateX(2px); }
+            100% { transform: translateX(3px) rotate(2deg); }
         }
 
-        @keyframes shift {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-5px); }
+        @keyframes rotateWeird {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes textGlitch {
+            0% { content: 'USERNAME: 666'; }
+            25% { content: 'USE┐RNAME: 666'; }
+            50% { content: 'USERNAME: 6┐66'; }
+            75% { content: 'US┐ERNAME: 666'; }
+            100% { content: 'USERNAME: 666'; }
+        }
+
+        @keyframes moveBtn {
+            0% { right: 20px; top: 20px; }
+            50% { right: 30px; top: 25px; }
+            100% { right: 15px; top: 18px; }
         }
 
         @keyframes deform {
-            0% { transform: scale(1) rotate(0deg); }
-            100% { transform: scale(1.02) rotate(1deg); }
+            0% { transform: scale(1); border-radius: 0; }
+            50% { transform: scale(1.01) skewY(1deg); border-radius: 10px; }
+            100% { transform: scale(1) skewY(-1deg); }
         }
 
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 0.85; }
-        }
-
-        @keyframes drip {
+        @keyframes moveContainer {
             0% { transform: translateY(0); }
-            100% { transform: translateY(6px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(5px); }
+        }
+
+        @keyframes videoGlitch {
+            0% { transform: translateX(0) scale(1); }
+            25% { transform: translateX(-2px) scale(1.005); }
+            50% { transform: translateX(1px) scale(0.995); }
+            75% { transform: translateX(-1px) scale(1.002); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes glitchFlash {
+            0% { display: none; }
+            98% { display: none; }
+            99% { display: block; background: rgba(255,0,0,0.5); }
+            100% { display: none; }
+        }
+
+        @keyframes textShake {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(1px); }
         }
 
         @keyframes float {
@@ -352,15 +248,9 @@
             100% { top: 100vh; left: calc(Math.random() * 100)%; transform: rotate(360deg); opacity: 0; }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
-            .videos-container {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 20px;
-            }
-            .channel-name {
-                font-size: 22px;
-            }
+            .video-wrapper { height: 300px; }
+            .channel-name { font-size: 22px; }
         }
     </style>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/216/216788.png" type="image/x-icon">
@@ -368,100 +258,38 @@
 <body>
     <button class="back-btn" onclick="window.location.href='https://mikuthehacker.github.io/ytub'">← BACK TO YEWTOOB_98</button>
 
-    <!-- CABECERA DEL CANAL USERNAME: 666 -->
+    <!-- SUSTO ESPERANDO -->
+    <div class="jump-scare" id="jumpScare"></div>
+
     <div class="channel-header">
         <div class="channel-avatar"></div>
-        <div class="channel-info">
-            <div class="channel-name">USERNAME: 666</div>
-            <div class="channel-desc">OFFICIAL CHANNEL - ALL VIDEOS PROPERTY OF USER 666</div>
-        </div>
+        <div class="channel-name">USERNAME: 666</div>
     </div>
 
-    <!-- CONTENEDOR DE VIDEOS DEL CANAL -->
-    <main class="videos-container" id="videos-container">
-        <!-- Los videos se generan automáticamente -->
+    <main class="video-container">
+        <div class="video-wrapper">
+            <div class="glitch-overlay"></div>
+            <iframe src="https://www.youtube.com/embed/6n3pFFPSlW4?autoplay=1" title="Username: 666" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        
+        <div class="video-desc">
+            VIDEO ███████ ███████ USERNAME: 666 • ███████ CREADO EN 2005 • ███████ ERROR AL CARGAR DESCRIPCIÓN • ███████ NO CERRAR ESTA PÁGINA • ███████ 666 666 666
+        </div>
     </main>
 
+    <audio id="staticSound" loop>
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-static-noise-glitch-effect-2569.mp3" type="audio/mpeg">
+    
+
+    <audio id="jumpSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-scary-scream-947.mp3" type="audio/mpeg">
+    
+
     <script>
-        // LISTA LITERAL DE VIDEOS DEL CANAL USERNAME: 666
-        const USER_666_VIDEOS = [
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-                title: "VIDEO 666-001: FOREST STATIC"
-            },
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-                title: "VIDEO 666-002: ABANDONED SITE"
-            },
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-                title: "VIDEO 666-003: RIVER OF SHADOWS"
-            },
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-                title: "VIDEO 666-004: STATIC NOISE"
-            },
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-                title: "VIDEO 666-005: EMPTY ROADS"
-            },
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-                title: "VIDEO 666-006: GLITCHED FOOTAGE"
-            },
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-                title: "VIDEO 666-007: DARK FOREST"
-            },
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
-                title: "VIDEO 666-008: ABANDONED CARS"
-            }
-        ];
-
-        const container = document.getElementById('videos-container');
-
-        // GENERAR TODOS LOS VIDEOS DEL CANAL USERNAME: 666
-        function loadUser666Videos() {
-            USER_666_VIDEOS.forEach((video, index) => {
-                const card = document.createElement('div');
-                card.className = 'video-card';
-                card.style.animationDelay = `${index * 0.2}s`;
-                card.setAttribute('data-title', video.title);
-                
-                // AL HACER CLIC, REPRODUCIR EL VIDEO DEL CANAL
-                card.onclick = () => {
-                    const videoPlayer = document.createElement('video');
-                    videoPlayer.style.position = 'fixed';
-                    videoPlayer.style.top = '50%';
-                    videoPlayer.style.left = '50%';
-                    videoPlayer.style.transform = 'translate(-50%, -50%)';
-                    videoPlayer.style.width = '80%';
-                    videoPlayer.style.zIndex = '20';
-                    videoPlayer.controls = true;
-                    
-                    const source = document.createElement('source');
-                    source.src = video.url;
-                    source.type = 'video/mp4';
-                    
-                    videoPlayer.appendChild(source);
-                    document.body.appendChild(videoPlayer);
-                    videoPlayer.play();
-
-                    // CERRAR VIDEO AL HACER CLIC FUERA
-                    videoPlayer.onclick = (e) => e.stopPropagation();
-                    document.body.onclick = () => {
-                        videoPlayer.remove();
-                        document.body.onclick = null;
-                    };
-                };
-
-                container.appendChild(card);
-            });
-        }
-
-        // CARGAR VIDEOS AL INICIAR
-        loadUser666Videos();
+        // SONIDO DE ESTÁTICA SIEMPRE ACTIVO
+        const staticSound = document.getElementById('staticSound');
+        staticSound.volume = 0.2;
+        staticSound.play();
 
         // MANOS FLOTANTES
         setInterval(() => {
@@ -472,253 +300,41 @@
             document.body.appendChild(hand);
             setTimeout(() => hand.remove(), 30000);
         }, 1500);
-    </script>
-</body>
-</html>
-            opacity: 0.15;
-            z-index: -2;
-        }
 
-        /* Flickering dark layer */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.75);
-            z-index: -1;
-            animation: flicker 0.2s infinite alternate;
-        }
+        // SUSTO ALEATORIO ENTRE 10 Y 30 SEGUNDOS
+        const jumpScare = document.getElementById('jumpScare');
+        const jumpSound = document.getElementById('jumpSound');
+        const scareTime = Math.floor(Math.random() * 20000) + 10000; // Entre 10 y 30s
 
-        /* Page header */
-        header {
-            padding: 15px 20px;
-            border-bottom: 3px solid #990000;
-            background: rgba(0,0,0,0.95);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            animation: warp 8s infinite alternate;
-        }
+        setTimeout(() => {
+            jumpScare.style.display = 'block';
+            jumpSound.volume = 0.8;
+            jumpSound.play();
+            
+            // QUITAR SUSTO DESPUÉS DE 1 SEGUNDO
+            setTimeout(() => {
+                jumpScare.style.display = 'none';
+            }, 1000);
+        }, scareTime);
 
-        .logo {
-            font-size: 26px;
-            color: #ff3333;
-            letter-spacing: 3px;
-            animation: shake 0.4s infinite alternate;
-        }
-
-        .back-btn {
-            padding: 8px 15px;
-            background: #990000;
-            border: none;
-            color: #000;
-            animation: shake 0.6s infinite alternate;
-        }
-
-        /* Video container */
-        .video-section {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 20px;
-            border: 2px solid #990000;
-            animation: deform 10s infinite alternate;
-        }
-
-        /* Video player area */
-        .video-player {
-            width: 100%;
-            height: 600px;
-            background: #000;
-            border: 2px solid #990000;
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        /* Random video placeholder + blood overlay */
-        .video-player::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://cdn-icons-png.flaticon.com/512/3060/3060982.png');
-            background-size: cover;
-            opacity: 0.3;
-            animation: bloodDrip 12s infinite alternate;
-        }
-
-        /* Video info */
-        .video-info {
-            padding: 15px;
-            border: 1px solid #990000;
-            animation: shake 0.5s infinite alternate;
-        }
-
-        .video-title {
-            font-size: 22px;
-            color: #ff3333;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-            animation: glitchText 5s infinite alternate;
-        }
-
-        .channel-info {
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-
-        .channel-name {
-            color: #ff3333;
-            font-weight: bold;
-        }
-
-        /* Floating hands */
-        .floating-hand {
-            position: absolute;
-            width: 80px;
-            height: 100px;
-            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png');
-            background-size: cover;
-            opacity: 0.2;
-            animation: float 25s infinite linear;
-        }
-
-        /* Animations */
-        @keyframes flicker {
-            0% { background: rgba(0,0,0,0.75); }
-            100% { background: rgba(0,0,0,0.85); }
-        }
-
-        @keyframes warp {
-            0% { transform: skewX(0deg); }
-            100% { transform: skewX(2deg); }
-        }
-
-        @keyframes shake {
-            0% { transform: translateX(0) rotate(0deg); }
-            100% { transform: translateX(2px) rotate(1deg); }
-        }
-
-        @keyframes deform {
-            0% { transform: scale(1); border-radius: 0; }
-            100% { transform: scale(1.01); border-radius: 5px; }
-        }
-
-        @keyframes bloodDrip {
-            0% { transform: translateY(0); opacity: 0.3; }
-            100% { transform: translateY(5px); opacity: 0.4; }
-        }
-
-        @keyframes glitchText {
-            0% { content: 'RANDOM VIDEO: FOREST DISTURBANCE'; }
-            25% { content: 'RANDOM VIDEO: ABANDONED PLACE'; }
-            50% { content: 'RANDOM VIDEO: RIVER OF BLOOD'; }
-            75% { content: 'RANDOM VIDEO: STATIC NOISE'; }
-            100% { content: 'RANDOM VIDEO: FOREST DISTURBANCE'; }
-        }
-
-        @keyframes float {
-            0% { top: -100px; left: calc(Math.random() * 100)%; transform: rotate(0deg); }
-            100% { top: 100vh; left: calc(Math.random() * 100)%; transform: rotate(360deg); opacity: 0; }
-        }
-
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            .video-player {
-                height: 300px;
-            }
-            .video-title {
-                font-size: 18px;
-            }
-        }
-    </style>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/216/216788.png" type="image/x-icon">
-</head>
-<body>
-    <header>
-        <div class="logo">VIDEO_666</div>
-        <a href="https://mikuthehacker.github.io/ytub" class="back-btn">← BACK TO YEWTOOB_98</a>
-    </header>
-
-    <main class="video-section">
-        <div class="video-player" id="random-video">
-            <!-- Random video from Username: 666 will load here -->
-            <video id="player" controls width="100%" height="100%">
-                <source id="video-source" src="" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-
-        <div class="video-info">
-            <div class="video-title" id="video-title">RANDOM VIDEO: FOREST DISTURBANCE</div>
-            <div class="channel-info">
-                <span class="channel-name">Username: 666</span> • 1,666 VIEWS • RANDOM DATE
-            </div>
-            <p id="video-desc">
-                RANDOM VIDEO FROM USERNAME: 666 - CONTENT GENERATED AUTOMATICALLY. NO EDITING, NO FILTERS.
-                THIS VIDEO WAS UPLOADED TO THE RUSTY YEWTOOB_98 PLATFORM. ALL RIGHTS RESERVED TO THE UPLOADER.
-            </p>
-        </div>
-    </main>
-
-    <script>
-        // LIST OF RANDOM VIDEOS FROM "Username: 666" (use actual video URLs or free stock ones)
-        const VIDEO_LIST = [
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-                title: "RANDOM VIDEO: FOREST DISTURBANCE",
-                desc: "FOOTAGE OF UNKNOWN FOREST AREA - UPLOADED BY USERNAME: 666"
-            },
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-                title: "RANDOM VIDEO: ABANDONED PLACE",
-                desc: "EMPTY BUILDING FOOTAGE - UPLOADED BY USERNAME: 666"
-            },
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-                title: "RANDOM VIDEO: RIVER OF BLOOD",
-                desc: "WATER BODY FOOTAGE - UPLOADED BY USERNAME: 666"
-            },
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-                title: "RANDOM VIDEO: STATIC NOISE",
-                desc: "STATIC AND GLITCH FOOTAGE - UPLOADED BY USERNAME: 666"
-            },
-            {
-                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-                title: "RANDOM VIDEO: ABANDONED ROADS",
-                desc: "EMPTY ROAD FOOTAGE - UPLOADED BY USERNAME: 666"
-            }
-        ];
-
-        // Pick random video from the list
-        const randomIndex = Math.floor(Math.random() * VIDEO_LIST.length);
-        const selectedVideo = VIDEO_LIST[randomIndex];
-
-        // Load random video
-        const player = document.getElementById('player');
-        const videoSource = document.getElementById('video-source');
-        const videoTitle = document.getElementById('video-title');
-        const videoDesc = document.getElementById('video-desc');
-
-        videoSource.src = selectedVideo.url;
-        videoTitle.textContent = selectedVideo.title;
-        videoDesc.textContent = selectedVideo.desc;
-        player.load();
-
-        // Spawn floating hands
+        // GLITCH DE TEXTO EN LA DESCRIPCIÓN
         setInterval(() => {
-            const hand = document.createElement('div');
-            hand.className = 'floating-hand';
-            hand.style.left = `${Math.random() * 100}%`;
-            hand.style.animationDuration = `${20 + Math.random() * 15}s`;
-            document.body.appendChild(hand);
-            setTimeout(() => hand.remove(), 30000);
-        }, 2000);
+            const desc = document.querySelector('.video-desc');
+            const texts = [
+                "VIDEO ███████ ███████ USERNAME: 666 • ███████ CREADO EN 2005 • ERROR AL CARGAR • 666 666 666",
+                "VIDEO ███████ ███████ USERNAME: 666 • ███████ BORRADO EN 2007 • ¿POR QUÉ LO ABRISTE? • 666 666",
+                "VIDEO ███████ ███████ USERNAME: 666 • ███████ NO EXISTE • ESTO NO ES REAL • 666 666 666",
+                "VIDEO ███████ ███████ USERNAME: 666 • ███████ TE ESTÁ VIENDO • CERRÁ LA PÁGINA • 666 666"
+            ];
+            desc.textContent = texts[Math.floor(Math.random() * texts.length)];
+        }, 3000);
+
+        // CAMBIAR CURSOR DE VEZ EN CUANDO
+        setInterval(() => {
+            document.body.style.cursor = Math.random() > 0.5 
+                ? 'url(https://cdn-icons-png.flaticon.com/512/3081/3081227.png), auto' 
+                : 'url(https://cdn-icons-png.flaticon.com/512/4159/4159289.png), auto';
+        }, 5000);
     </script>
 </body>
 </html>
