@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite 3D Space</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+
+        // 3D scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Generate infinite stars
+        const starCount = 1500;
+        const starGeometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(starCount * 3);
+        const colors = new Float32Array(starCount * 3);
+
+        for (let i = 0; i < starCount * 3; i += 3) {
+            // Random positions
+            positions[i] = (Math.random() - 0.5) * 2000;
+            positions[i + 1] = (Math.random() - 0.5) * 2000;
+            positions[i + 2] = -Math.random() * 6000;
+
+            // Random colors (whites, blues, and yellows)
+            colors[i] = Math.random() * 0.8 + 0.2;
+            colors[i + 1] = Math.random() * 0.8 + 0.2;
+            colors[i + 2] = Math.random() * 1;
+        }
+
+        starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        starGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        
+        const starMaterial = new THREE.PointsMaterial({ 
+            size: 2.5, 
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.9
+        });
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        scene.add(stars);
+
+        camera.position.z = 0;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const positions = stars.geometry.attributes.position.array;
+            for (let i = 0; i < starCount * 3; i += 3) {
+                positions[i + 2] += 6; // Movement speed
+                if (positions[i + 2] > 150) {
+                    // Move star back to the far background
+                    positions[i] = (Math.random() - 0.5) * 2000;
+                    positions[i + 1] = (Math.random() - 0.5) * 2000;
+                    positions[i + 2] = -Math.random() * 6000;
+
+                    // Update color when repositioning
+                    const colors = stars.geometry.attributes.color.array;
+                    colors[i] = Math.random() * 0.8 + 0.2;
+                    colors[i + 1] = Math.random() * 0.8 + 0.2;
+                    colors[i + 2] = Math.random() * 1;
+                    stars.geometry.attributes.color.needsUpdate = true;
+                }
+            }
+            stars.geometry.attributes.position.needsUpdate = true;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
