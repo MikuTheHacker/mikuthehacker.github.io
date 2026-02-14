@@ -13,7 +13,7 @@
         }
 
         body {
-            background: #050505;
+            background: #000000;
             color: #990000;
             overflow-x: hidden;
             position: relative;
@@ -22,7 +22,7 @@
             background-size: 2px;
         }
 
-        /* Blood background overlay */
+        /* Fondo de sangre y manos */
         body::before {
             content: '';
             position: fixed;
@@ -32,8 +32,301 @@
             height: 100%;
             background-image: url('https://cdn-icons-png.flaticon.com/512/3060/3060978.png'),
                               url('https://cdn-icons-png.flaticon.com/512/4159/4159288.png');
-            background-size: 250px, 200px;
-            background-repeat: repeat;
+            background-size: 200px, 180px;
+            background-repeat: repeat, no-repeat;
+            background-position: 0 0, 80% 70%;
+            opacity: 0.18;
+            z-index: -2;
+        }
+
+        /* Capa parpadeante */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: -1;
+            animation: flicker 0.2s infinite alternate;
+        }
+
+        /* Cabecera del canal USERNAME: 666 */
+        .channel-header {
+            padding: 20px;
+            border-bottom: 4px solid #990000;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            align-items: center;
+            animation: warp 12s infinite alternate;
+        }
+
+        .channel-avatar {
+            width: 80px;
+            height: 80px;
+            border: 3px solid #990000;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png');
+            background-size: cover;
+            margin-right: 20px;
+            animation: shake 0.5s infinite alternate;
+        }
+
+        .channel-info {
+            animation: shake 0.4s infinite alternate;
+        }
+
+        .channel-name {
+            font-size: 28px;
+            color: #ff3333;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+        }
+
+        .channel-desc {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        /* Contenedor de videos del canal */
+        .videos-container {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            animation: shift 20s infinite alternate;
+        }
+
+        /* Cada video del canal USERNAME: 666 */
+        .video-card {
+            height: 200px;
+            border: 2px solid #990000;
+            position: relative;
+            animation: deform 8s infinite alternate, fadeIn 2s forwards;
+            opacity: 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .video-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 20px #ff3333;
+        }
+
+        /* Sangre en videos */
+        .video-card::before {
+            content: '';
+            position: absolute;
+            top: 5%;
+            left: 10%;
+            width: 80%;
+            height: 70%;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/3060/3060982.png');
+            background-size: cover;
+            opacity: 0.4;
+            animation: drip 15s infinite alternate;
+        }
+
+        /* Título de cada video */
+        .video-card::after {
+            content: attr(data-title);
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: #ff3333;
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+
+        /* Botón volver */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 15px;
+            background: #990000;
+            border: none;
+            color: #000;
+            animation: shake 0.6s infinite alternate;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* Manos flotantes */
+        .floating-hand {
+            position: absolute;
+            width: 90px;
+            height: 120px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png');
+            background-size: cover;
+            opacity: 0.25;
+            animation: float 25s infinite linear;
+        }
+
+        /* Animaciones */
+        @keyframes flicker {
+            0% { background: rgba(0,0,0,0.65); }
+            100% { background: rgba(0,0,0,0.8); }
+        }
+
+        @keyframes warp {
+            0% { transform: skewX(0deg); }
+            100% { transform: skewX(2deg); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(2px); }
+        }
+
+        @keyframes shift {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-5px); }
+        }
+
+        @keyframes deform {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.02) rotate(1deg); }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 0.85; }
+        }
+
+        @keyframes drip {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(6px); }
+        }
+
+        @keyframes float {
+            0% { top: -150px; left: calc(Math.random() * 100)%; transform: rotate(0deg); }
+            100% { top: 100vh; left: calc(Math.random() * 100)%; transform: rotate(360deg); opacity: 0; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .videos-container {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 20px;
+            }
+            .channel-name {
+                font-size: 22px;
+            }
+        }
+    </style>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/216/216788.png" type="image/x-icon">
+</head>
+<body>
+    <button class="back-btn" onclick="window.location.href='https://mikuthehacker.github.io/ytub'">← BACK TO YEWTOOB_98</button>
+
+    <!-- CABECERA DEL CANAL USERNAME: 666 -->
+    <div class="channel-header">
+        <div class="channel-avatar"></div>
+        <div class="channel-info">
+            <div class="channel-name">USERNAME: 666</div>
+            <div class="channel-desc">OFFICIAL CHANNEL - ALL VIDEOS PROPERTY OF USER 666</div>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR DE VIDEOS DEL CANAL -->
+    <main class="videos-container" id="videos-container">
+        <!-- Los videos se generan automáticamente -->
+    </main>
+
+    <script>
+        // LISTA LITERAL DE VIDEOS DEL CANAL USERNAME: 666
+        const USER_666_VIDEOS = [
+            {
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                title: "VIDEO 666-001: FOREST STATIC"
+            },
+            {
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                title: "VIDEO 666-002: ABANDONED SITE"
+            },
+            {
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+                title: "VIDEO 666-003: RIVER OF SHADOWS"
+            },
+            {
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+                title: "VIDEO 666-004: STATIC NOISE"
+            },
+            {
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+                title: "VIDEO 666-005: EMPTY ROADS"
+            },
+            {
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+                title: "VIDEO 666-006: GLITCHED FOOTAGE"
+            },
+            {
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+                title: "VIDEO 666-007: DARK FOREST"
+            },
+            {
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+                title: "VIDEO 666-008: ABANDONED CARS"
+            }
+        ];
+
+        const container = document.getElementById('videos-container');
+
+        // GENERAR TODOS LOS VIDEOS DEL CANAL USERNAME: 666
+        function loadUser666Videos() {
+            USER_666_VIDEOS.forEach((video, index) => {
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.style.animationDelay = `${index * 0.2}s`;
+                card.setAttribute('data-title', video.title);
+                
+                // AL HACER CLIC, REPRODUCIR EL VIDEO DEL CANAL
+                card.onclick = () => {
+                    const videoPlayer = document.createElement('video');
+                    videoPlayer.style.position = 'fixed';
+                    videoPlayer.style.top = '50%';
+                    videoPlayer.style.left = '50%';
+                    videoPlayer.style.transform = 'translate(-50%, -50%)';
+                    videoPlayer.style.width = '80%';
+                    videoPlayer.style.zIndex = '20';
+                    videoPlayer.controls = true;
+                    
+                    const source = document.createElement('source');
+                    source.src = video.url;
+                    source.type = 'video/mp4';
+                    
+                    videoPlayer.appendChild(source);
+                    document.body.appendChild(videoPlayer);
+                    videoPlayer.play();
+
+                    // CERRAR VIDEO AL HACER CLIC FUERA
+                    videoPlayer.onclick = (e) => e.stopPropagation();
+                    document.body.onclick = () => {
+                        videoPlayer.remove();
+                        document.body.onclick = null;
+                    };
+                };
+
+                container.appendChild(card);
+            });
+        }
+
+        // CARGAR VIDEOS AL INICIAR
+        loadUser666Videos();
+
+        // MANOS FLOTANTES
+        setInterval(() => {
+            const hand = document.createElement('div');
+            hand.className = 'floating-hand';
+            hand.style.left = `${Math.random() * 100}%`;
+            hand.style.animationDuration = `${20 + Math.random() * 15}s`;
+            document.body.appendChild(hand);
+            setTimeout(() => hand.remove(), 30000);
+        }, 1500);
+    </script>
+</body>
+</html>
             opacity: 0.15;
             z-index: -2;
         }
