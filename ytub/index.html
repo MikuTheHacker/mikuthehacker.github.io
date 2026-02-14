@@ -20,10 +20,9 @@
             cursor: url('https://cdn-icons-png.flaticon.com/512/3081/3081227.png'), auto;
             background-image: url('https://cdn-icons-png.flaticon.com/512/103/103524.png');
             background-size: 2px;
-            background-repeat: repeat;
         }
 
-        /* Blood background */
+        /* Fondo de sangre */
         body::before {
             content: '';
             position: fixed;
@@ -34,6 +33,231 @@
             background-image: url('https://cdn-icons-png.flaticon.com/512/3060/3060978.png'), 
                               url('https://cdn-icons-png.flaticon.com/512/3060/3060980.png'),
                               url('https://cdn-icons-png.flaticon.com/512/3060/3060979.png');
+            background-size: 180px, 220px, 120px;
+            background-repeat: repeat;
+            opacity: 0.2;
+            z-index: -3;
+        }
+
+        /* Manchas de manos */
+        .hand-prints {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159288.png'),
+                              url('https://cdn-icons-png.flaticon.com/512/4159/4159290.png'),
+                              url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png');
+            background-size: 220px, 200px, 180px;
+            background-position: 10% 20%, 85% 75%, 45% 40%;
+            background-repeat: no-repeat;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        /* Cabecera estilo YouTube */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-bottom: 3px solid #990000;
+            background: rgba(0,0,0,0.95);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            animation: warp 10s infinite alternate;
+        }
+
+        .logo {
+            font-size: 28px;
+            color: #ff3333;
+            letter-spacing: 4px;
+            animation: shake 0.3s infinite alternate;
+        }
+
+        .search-bar {
+            width: 400px;
+            height: 35px;
+            border: 2px solid #550000;
+            background: #151515;
+            padding: 5px;
+            color: #990000;
+            animation: stretch 8s infinite alternate;
+        }
+
+        .upload-btn {
+            padding: 8px 16px;
+            background: #990000;
+            border: none;
+            color: #000;
+            animation: shake 0.6s infinite alternate;
+        }
+
+        /* Contenedor infinito */
+        main {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+            animation: shift 20s infinite alternate;
+        }
+
+        /* TARJETAS CLICKEABLES - AQUÍ ESTÁ EL ERROR CORREGIDO */
+        .card {
+            height: 180px;
+            border: 2px solid #990000;
+            position: relative;
+            animation: deform 6s infinite alternate, fadeIn 2s forwards;
+            opacity: 0;
+            /* IMPORTANTE: Asegurar que sean clicleables */
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* Efecto hover en tarjetas */
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #ff3333;
+        }
+
+        /* Sangre en tarjetas */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 5%;
+            left: 10%;
+            width: 80%;
+            height: 70%;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/3060/3060982.png');
+            background-size: cover;
+            opacity: 0.4;
+            animation: drip 15s infinite alternate;
+        }
+
+        /* Etiqueta USER_666 en todas las tarjetas */
+        .card::after {
+            content: 'USER: 666';
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: #ff3333;
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+
+        /* Manos flotantes */
+        .floating-hand {
+            position: absolute;
+            width: 100px;
+            height: 130px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png');
+            background-size: cover;
+            opacity: 0.25;
+            animation: float 25s infinite linear;
+        }
+
+        /* Animaciones */
+        @keyframes warp {
+            0% { transform: skewX(0deg); }
+            100% { transform: skewX(2deg); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(2px); }
+        }
+
+        @keyframes stretch {
+            0% { width: 400px; }
+            100% { width: 440px; }
+        }
+
+        @keyframes shift {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-5px); }
+        }
+
+        @keyframes deform {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.02); }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 0.8; }
+        }
+
+        @keyframes drip {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(6px); }
+        }
+
+        @keyframes float {
+            0% { top: -120px; left: calc(Math.random() * 100)%; transform: rotate(0deg); }
+            100% { top: 100vh; left: calc(Math.random() * 100)%; transform: rotate(360deg); opacity: 0; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-bar { width: 200px; }
+            main { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+        }
+    </style>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/216/216788.png" type="image/x-icon">
+</head>
+<body>
+    <div class="hand-prints"></div>
+
+    <header>
+        <div class="logo">YEWTOOB_98</div>
+        <input type="text" class="search-bar" placeholder="SEARCH USER 666...">
+        <button class="upload-btn">UPLOAD</button>
+    </header>
+
+    <main id="infinite-container"></main>
+
+    <script>
+        const container = document.getElementById('infinite-container');
+        const VIDEO_PAGE_LINK = 'https://mikuthehacker.github.io/ytub/video';
+        let cardCount = 30;
+
+        // CREAR TARJETAS INICIALES
+        createCards(cardCount);
+
+        // GENERAR MANOS FLOTANTES
+        setInterval(() => {
+            const hand = document.createElement('div');
+            hand.className = 'floating-hand';
+            hand.style.left = `${Math.random() * 100}%`;
+            document.body.appendChild(hand);
+            setTimeout(() => hand.remove(), 30000);
+        }, 1500);
+
+        // SCROLL INFINITO
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+                cardCount += 20;
+                createCards(20);
+            }
+        });
+
+        // FUNCIÓN CORREGIDA PARA CREAR TARJETAS ENLACES
+        function createCards(amount) {
+            for (let i = 0; i < amount; i++) {
+                // Crear como etiqueta <a> para que sea enlace
+                const card = document.createElement('a');
+                card.className = 'card';
+                card.href = VIDEO_PAGE_LINK; // ENLACE CORRECTO
+                card.target = '_self'; // Abrir en la misma pestaña
+                card.style.animationDelay = `${i * 0.1}s`;
+                container.appendChild(card);
+            }
+        }
+    </script>
+</body>
+</html>
             background-size: 180px, 220px, 120px;
             background-repeat: repeat;
             opacity: 0.2;
