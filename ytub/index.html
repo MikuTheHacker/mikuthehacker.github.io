@@ -85,6 +85,57 @@ document.head.appendChild(style);
 </script>
 </body>
 </html>
+<button class="upload-btn">UPLOAD</button>
+</header>
+<main id="cards-container"></main>
+<script>
+const LINK = "https://mikuthehacker.github.io/ytub/video";
+const container = document.getElementById("cards-container");
+let count = 30;
+
+function makeCards(amount) {
+for(let i=0;i<amount;i++){
+const card = document.createElement("div");
+card.className = "card";
+card.style.animationDelay = (i*0.1)+"s";
+const link = document.createElement("a");
+link.className = "card-link";
+link.href = LINK;
+link.target = "_self";
+card.appendChild(link);
+container.appendChild(card);
+}
+}
+
+makeCards(count);
+
+window.addEventListener("scroll",()=>{
+if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 500){
+count += 20;
+makeCards(20);
+}
+});
+
+setInterval(()=>{
+const hand = document.createElement("div");
+hand.style.position = "absolute";
+hand.style.width = "90px";
+hand.style.height = "120px";
+hand.style.backgroundImage = "url(https://cdn-icons-png.flaticon.com/512/4159/4159288.png)";
+hand.style.backgroundSize = "cover";
+hand.style.left = (Math.random()*100)+"%";
+hand.style.opacity = "0.25";
+hand.style.animation = "float "+(20+Math.random()*15)+"s infinite linear";
+document.body.appendChild(hand);
+setTimeout(()=>hand.remove(),30000);
+},1500);
+
+const style = document.createElement("style");
+style.textContent = "@keyframes float {0%{top:-150px;transform:rotate(0);}100%{top:100vh;transform:rotate(360deg);}}";
+document.head.appendChild(style);
+</script>
+</body>
+</html>
         }
 
         .hand-prints {
