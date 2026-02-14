@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,16 +13,14 @@
         }
 
         body {
-            background: #000000;
+            background: #000;
             color: #990000;
             overflow-x: hidden;
-            position: relative;
             cursor: url('https://cdn-icons-png.flaticon.com/512/3081/3081227.png'), auto;
             background-image: url('https://cdn-icons-png.flaticon.com/512/103/103524.png');
             background-size: 2px;
         }
 
-        /* Fondo de sangre y manos */
         body::before {
             content: '';
             position: fixed;
@@ -34,6 +32,156 @@
                               url('https://cdn-icons-png.flaticon.com/512/4159/4159288.png');
             background-size: 200px, 180px;
             background-repeat: repeat, no-repeat;
+            background-position: 0 0, 80% 70%;
+            opacity: 0.18;
+            z-index: -2;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: -1;
+            animation: flicker 0.2s infinite alternate;
+        }
+
+        .channel-header {
+            padding: 20px;
+            border-bottom: 4px solid #990000;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            align-items: center;
+            animation: warp 12s infinite alternate;
+        }
+
+        .channel-avatar {
+            width: 80px;
+            height: 80px;
+            border: 3px solid #990000;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png');
+            background-size: cover;
+            margin-right: 20px;
+            animation: shake 0.5s infinite alternate;
+        }
+
+        .channel-name {
+            font-size: 28px;
+            color: #ff3333;
+            letter-spacing: 3px;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 15px;
+            background: #990000;
+            border: none;
+            color: #000;
+            animation: shake 0.6s infinite alternate;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .video-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 2px solid #990000;
+            animation: deform 8s infinite alternate;
+        }
+
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #ff3333;
+            background: #000;
+        }
+
+        .video-desc {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #990000;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        @keyframes flicker {
+            0% { background: rgba(0,0,0,0.65); }
+            100% { background: rgba(0,0,0,0.8); }
+        }
+
+        @keyframes warp {
+            0% { transform: skewX(0deg); }
+            100% { transform: skewX(2deg); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(2px); }
+        }
+
+        @keyframes deform {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.01); }
+        }
+
+        @media (max-width: 768px) {
+            iframe { height: 300px; }
+            .channel-name { font-size: 22px; }
+        }
+    </style>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/216/216788.png" type="image/x-icon">
+</head>
+<body>
+    <button class="back-btn" onclick="window.location.href='https://mikuthehacker.github.io/ytub'">← BACK TO YEWTOOB_98</button>
+
+    <div class="channel-header">
+        <div class="channel-avatar"></div>
+        <div class="channel-name">USERNAME: 666</div>
+    </div>
+
+    <main class="video-container">
+        <!-- VIDEO OFICIAL DE YOUTUBE (nana825763) -->
+        <iframe src="https://www.youtube.com/embed/6n3pFFPSlW4" title="Username: 666" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        
+        <div class="video-desc">
+            VIDEO OFICIAL ASOCIADO A "USERNAME: 666" • CREADO POR NANA825763 (PIROPITO) • SUBIDO A YOUTUBE EN 2008 • BASE DE LA LEYENDA URBANA DEL CANAL PERDIDO.
+        </div>
+    </main>
+
+    <script>
+        // MANOS FLOTANTES
+        setInterval(() => {
+            const hand = document.createElement('div');
+            hand.style.position = 'absolute';
+            hand.style.width = '90px';
+            hand.style.height = '120px';
+            hand.style.backgroundImage = 'url(https://cdn-icons-png.flaticon.com/512/4159/4159289.png)';
+            hand.style.backgroundSize = 'cover';
+            hand.style.opacity = '0.25';
+            hand.style.left = `${Math.random() * 100}%`;
+            hand.style.animation = `float ${20 + Math.random() * 15}s infinite linear`;
+            document.body.appendChild(hand);
+            setTimeout(() => hand.remove(), 30000);
+        }, 1500);
+
+        // ANIMACIÓN DE MANOS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0% { top: -150px; transform: rotate(0deg); }
+                100% { top: 100vh; transform: rotate(360deg); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
             background-position: 0 0, 80% 70%;
             opacity: 0.18;
             z-index: -2;
