@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1000 Kittens Inside!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            background-color: #ff69b4;
+            text-align: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        .scroll-area {
+            margin-top: 100px;
+            padding-bottom: 20px;
+        }
+        .fake-section {
+            height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border-bottom: 3px dashed #ff69b4;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">✨ SCROLL DOWN TO SEE 1000 KITTENS ✨</div>
+    
+    <div class="scroll-area" id="scrollContainer">
+        <div class="fake-section">Almost there! 🐾</div>
+        <div class="fake-section">Just a little more... 🐱</div>
+        <div class="fake-section">They're right ahead... 🐾</div>
+    </div>
+
+    <script>
+        const container = document.getElementById('scrollContainer');
+        
+        // Detect when scrolling near the bottom
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            
+            // Add new sections when user gets close to the end
+            if (scrollTop + windowHeight >= documentHeight - 20) {
+                const newSections = [
+                    "You're so close now! 🐾",
+                    "Almost there, promise! 🐱",
+                    "Just a tiny bit more... 🐾"
+                ];
+                
+                newSections.forEach(text => {
+                    const section = document.createElement('div');
+                    section.className = 'fake-section';
+                    section.textContent = text;
+                    container.appendChild(section);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
