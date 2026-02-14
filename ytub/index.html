@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>_Y_T_U_B_</title>
+    <title>YoUtUbE</title>
     <style>
         * {
             margin: 0;
@@ -18,6 +18,10 @@
             overflow-x: hidden;
             position: relative;
             cursor: url('https://cdn-icons-png.flaticon.com/512/3081/3081227.png'), auto;
+            /* Old browser glitch effect */
+            background-image: url('https://cdn-icons-png.flaticon.com/512/103/103524.png');
+            background-size: 1px;
+            background-repeat: repeat;
         }
 
         /* Blood splatter background */
@@ -34,6 +38,312 @@
             background-size: 180px, 220px, 120px;
             background-repeat: repeat;
             opacity: 0.18;
+            z-index: -3;
+            animation: fadeInOut 10s infinite alternate;
+        }
+
+        /* Flickering dark overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: -2;
+            animation: flicker 0.2s infinite alternate;
+        }
+
+        /* Bloody hand prints layer */
+        .hand-prints {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159288.png'),
+                              url('https://cdn-icons-png.flaticon.com/512/4159/4159290.png');
+            background-size: 200px, 180px;
+            background-position: 10% 20%, 85% 75%;
+            background-repeat: no-repeat;
+            opacity: 0.25;
+            z-index: -1;
+            animation: slideHands 45s infinite alternate;
+        }
+
+        /* Distorted old-school navbar */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 25px;
+            border-bottom: 3px solid #990000;
+            position: sticky;
+            top: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 10;
+            animation: warp 15s infinite alternate;
+            /* Old button look */
+            border-right: 2px solid #550000;
+            border-bottom: 4px solid #550000;
+        }
+
+        .logo {
+            font-size: 30px;
+            font-weight: bold;
+            color: #ff3333;
+            letter-spacing: 4px;
+            animation: shake 0.4s infinite alternate;
+            /* Rusted text effect */
+            text-shadow: 2px 2px 0 #550000;
+        }
+
+        .search-bar {
+            width: 420px;
+            height: 38px;
+            border: 2px solid #550000;
+            background: #151515;
+            padding: 5px;
+            color: #990000;
+            animation: stretch 10s infinite alternate;
+            /* Old input look */
+            box-shadow: inset 1px 1px 0 #770000;
+        }
+
+        .upload-btn {
+            padding: 9px 18px;
+            background: #990000;
+            border: none;
+            color: #000;
+            font-size: 14px;
+            animation: shake 0.7s infinite alternate;
+            /* Old button look */
+            border-top: 2px solid #bb2222;
+            border-left: 2px solid #bb2222;
+            border-right: 2px solid #550000;
+            border-bottom: 2px solid #550000;
+        }
+
+        /* Infinite container */
+        main {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 35px;
+            animation: shiftContainer 25s infinite alternate;
+        }
+
+        /* Empty distorted cards */
+        .card {
+            height: 190px;
+            border: 2px solid #990000;
+            border-radius: 3px;
+            position: relative;
+            animation: deform 7s infinite alternate, fadeIn 2.5s forwards;
+            opacity: 0;
+            /* Old frame look */
+            border-right: 3px solid #550000;
+            border-bottom: 3px solid #550000;
+        }
+
+        /* Blood smears on cards */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 8%;
+            left: 12%;
+            width: 75%;
+            height: 65%;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/3060/3060982.png');
+            background-size: cover;
+            opacity: 0.35;
+            animation: bloodDrip 18s infinite alternate;
+        }
+
+        /* Creepy old text on cards */
+        .card::after {
+            content: '. . . L O A D I N G . . .';
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            color: #ff3333;
+            font-size: 13px;
+            letter-spacing: 3px;
+            animation: changeText 6s infinite;
+        }
+
+        /* Floating bloody hands */
+        .floating-hand {
+            position: absolute;
+            width: 90px;
+            height: 120px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png');
+            background-size: cover;
+            opacity: 0.22;
+            animation: drift 30s infinite linear;
+            transform-origin: center;
+        }
+
+        /* Old browser glitch text at bottom */
+        .glitch-footer {
+            position: fixed;
+            bottom: 5px;
+            left: 5px;
+            font-size: 10px;
+            color: #990000;
+            animation: glitchText 3s infinite alternate;
+        }
+
+        /* Animations */
+        @keyframes fadeInOut {
+            0% { opacity: 0.15; }
+            100% { opacity: 0.22; }
+        }
+
+        @keyframes flicker {
+            0% { background: rgba(0,0,0,0.75); }
+            100% { background: rgba(0,0,0,0.85); }
+        }
+
+        @keyframes slideHands {
+            0% { background-position: 10% 20%, 85% 75%; opacity: 0.25; }
+            100% { background-position: 12% 22%, 83% 78%; opacity: 0.3; }
+        }
+
+        @keyframes warp {
+            0% { transform: skewX(0deg) scaleX(1); }
+            100% { transform: skewX(3deg) scaleX(1.01); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0px) rotate(0deg); }
+            100% { transform: translateX(3px) rotate(1.5deg); }
+        }
+
+        @keyframes stretch {
+            0% { width: 420px; height: 38px; }
+            100% { width: 470px; height: 40px; }
+        }
+
+        @keyframes shiftContainer {
+            0% { transform: translateY(0px) translateX(0px); }
+            100% { transform: translateY(-7px) translateX(4px); }
+        }
+
+        @keyframes deform {
+            0% { transform: scale(1) rotate(0deg); border-radius: 3px; }
+            100% { transform: scale(1.03) rotate(1.2deg); border-radius: 6px; }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 0.85; }
+        }
+
+        @keyframes bloodDrip {
+            0% { transform: translateY(0px); opacity: 0.35; }
+            100% { transform: translateY(7px); opacity: 0.45; }
+        }
+
+        @keyframes changeText {
+            0% { content: '. . . L O A D I N G . . .'; }
+            20% { content: '. . . F O U N D . . .'; }
+            40% { content: '. . . W A R N I N G . . .'; }
+            60% { content: '. . . N O T . . . F O U N D . . .'; }
+            80% { content: '. . . C L O S I N G . . .'; }
+            100% { content: '. . . L O A D I N G . . .'; }
+        }
+
+        @keyframes drift {
+            0% { 
+                transform: translateY(-150px) rotate(0deg) scale(0.8); 
+                left: calc(Math.random() * 100)%; 
+            }
+            100% { 
+                transform: translateY(100vh) rotate(360deg) scale(1.1); 
+                opacity: 0;
+            }
+        }
+
+        @keyframes glitchText {
+            0% { content: 'SYSTEM.CFG CORRUPTED - v1998.07b'; }
+            50% { content: 'SYS_┐TEM.CFG C┐ORRUPTED - v1998.07b'; }
+            100% { content: 'SYSTEM.CFG CORRUPTED - v1998.0┐7b'; }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .search-bar {
+                width: 220px;
+            }
+            main {
+                grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+                gap: 25px;
+            }
+            .hand-prints {
+                background-size: 150px, 130px;
+            }
+        }
+    </style>
+    <!-- Old browser icon -->
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/216/216788.png" type="image/x-icon">
+</head>
+<body>
+    <div class="hand-prints"></div>
+    <header>
+        <div class="logo">YEWTOOB_98</div>
+        <input type="text" class="search-bar" placeholder="...SEARCH_VIDEO...">
+        <button class="upload-btn">U P L O A D_98</button>
+    </header>
+
+    <main id="infinite-container">
+        <!-- Cards generate automatically -->
+    </main>
+
+    <div class="glitch-footer"></div>
+
+    <script>
+        const container = document.getElementById('infinite-container');
+        let cardCount = 25;
+
+        // Generate initial cards
+        generateCards(cardCount);
+
+        // Spawn floating bloody hands
+        setInterval(() => {
+            const hand = document.createElement('div');
+            hand.className = 'floating-hand';
+            hand.style.left = `${Math.random() * 100}%`;
+            hand.style.animationDuration = `${20 + Math.random() * 25}s`;
+            document.body.appendChild(hand);
+            
+            // Remove after animation ends
+            setTimeout(() => {
+                hand.remove();
+            }, 35000);
+        }, 1500);
+
+        // Infinite scroll: add more cards when near bottom
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 600) {
+                cardCount += 18;
+                generateCards(18);
+            }
+        });
+
+        // Create empty distorted cards
+        function generateCards(amount) {
+            for (let i = 0; i < amount; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = `${i * 0.12}s`;
+                container.appendChild(card);
+            }
+        }
+    </script>
+</body>
+</html>
             z-index: -3;
             animation: fadeInOut 10s infinite alternate;
         }
