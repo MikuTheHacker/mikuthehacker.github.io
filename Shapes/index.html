@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fondo Infinito con Formas</title>
+    <title>Fondo Infinito Real con Formas</title>
     <style>
         * {
             margin: 0;
@@ -12,28 +12,164 @@
         }
 
         body {
-            overflow-x: auto;
-            min-height: 200vh;
-            min-width: 200vw;
+            overflow: auto;
+            background-color: #1a1a2e;
             position: relative;
-            background-color: #f0f8ff;
+        }
+
+        .shape-container {
+            position: absolute;
+            width: 200vw;
+            height: 200vh;
         }
 
         .shape {
             position: absolute;
-            border-radius: 2px;
-            opacity: 0.7;
-            transition: transform 0.3s ease;
+            opacity: 0.8;
+            transition: all 0.2s ease;
         }
 
         .shape:hover {
-            transform: scale(1.2);
             opacity: 1;
+            transform: rotate(10deg) scale(1.3);
         }
 
+        /* Tipos de formas */
         .square {
+            width: 35px;
+            height: 35px;
+        }
+
+        .circle {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+        }
+
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-bottom: 30px solid;
+        }
+
+        .rectangle {
+            width: 60px;
+            height: 30px;
+        }
+
+        .hexagon {
             width: 40px;
-            height: 40px;
+            height: 23px;
+            background-color: currentColor;
+            position: relative;
+        }
+        .hexagon:before, .hexagon:after {
+            content: "";
+            position: absolute;
+            width: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+        }
+        .hexagon:before {
+            bottom: 100%;
+            border-bottom: 11.5px solid currentColor;
+        }
+        .hexagon:after {
+            top: 100%;
+            border-top: 11.5px solid currentColor;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const colors = ['#e94560', '#00b4d8', '#9b5de5', '#f15bb5', '#fee440', '#00f5d4'];
+        const shapes = ['square', 'circle', 'triangle', 'rectangle', 'hexagon'];
+        const shapeDensity = 80; // Cantidad de formas por cada bloque de área
+        const blockSize = 500; // Tamaño del bloque que se repite
+
+        // Función para crear formas en un área específica
+        function createShapesInArea(xOffset, yOffset) {
+            const container = document.createElement('div');
+            container.classList.add('shape-container');
+            container.style.left = `${xOffset}px`;
+            container.style.top = `${yOffset}px`;
+
+            for (let i = 0; i < shapeDensity; i++) {
+                const shape = document.createElement('div');
+                const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                const posX = Math.floor(Math.random() * blockSize);
+                const posY = Math.floor(Math.random() * blockSize);
+
+                shape.classList.add('shape', randomShape);
+                shape.style.left = `${posX}px`;
+                shape.style.top = `${posY}px`;
+                
+                if (randomShape === 'triangle') {
+                    shape.style.borderBottomColor = randomColor;
+                } else if (randomShape === 'hexagon') {
+                    shape.style.color = randomColor;
+                } else {
+                    shape.style.backgroundColor = randomColor;
+                }
+
+                container.appendChild(shape);
+            }
+
+            document.body.appendChild(container);
+        }
+
+        // Crear bloques iniciales
+        function createInitialBlocks() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const blocksX = Math.ceil(viewportWidth / blockSize) + 2;
+            const blocksY = Math.ceil(viewportHeight / blockSize) + 2;
+
+            for (let x = -blockSize; x < blocksX * blockSize; x += blockSize) {
+                for (let y = -blockSize; y < blocksY * blockSize; y += blockSize) {
+                    createShapesInArea(x, y);
+                }
+            }
+        }
+
+        // Crear nuevos bloques al hacer scroll
+        window.addEventListener('scroll', () => {
+            const scrollX = window.scrollX;
+            const scrollY = window.scrollY;
+            const currentBlockX = Math.floor(scrollX / blockSize) * blockSize;
+            const currentBlockY = Math.floor(scrollY / blockSize) * blockSize;
+
+            // Crear bloques alrededor de la posición actual
+            for (let x = currentBlockX - blockSize; x <= currentBlockX + (2 * blockSize); x += blockSize) {
+                for (let y = currentBlockY - blockSize; y <= currentBlockY + (2 * blockSize); y += blockSize) {
+                    // Verificar si el bloque ya existe
+                    const existing = document.querySelector(`.shape-container[style*="left: ${x}px"][style*="top: ${y}px"]`);
+                    if (!existing) {
+                        createShapesInArea(x, y);
+                    }
+                }
+            }
+
+            // Eliminar bloques que están muy lejos para no sobrecargar
+            const containers = document.querySelectorAll('.shape-container');
+            containers.forEach(container => {
+                const left = parseInt(container.style.left);
+                const top = parseInt(container.style.top);
+                if (left < scrollX - (3 * blockSize) || left > scrollX + (3 * blockSize) ||
+                    top < scrollY - (3 * blockSize) || top > scrollY + (3 * blockSize)) {
+                    container.remove();
+                }
+            });
+        });
+
+        // Inicializar
+        createInitialBlocks();
+    </script>
+</body>
+</html>
         }
 
         .circle {
