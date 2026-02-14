@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YoUtUbE</title>
+    <!-- RUSTY PAGE NAME YOU ASKED FOR -->
+    <title>YewToob_1998.xht</title>
     <style>
         * {
             margin: 0;
@@ -17,14 +18,16 @@
             color: #990000;
             overflow-x: hidden;
             position: relative;
+            /* NO VIDEOS - NO CONTENT AT ALL */
+            /* BLOODY HAND CURSOR */
             cursor: url('https://cdn-icons-png.flaticon.com/512/3081/3081227.png'), auto;
-            /* Old browser glitch effect */
+            /* RANCID/OLD LOOK */
             background-image: url('https://cdn-icons-png.flaticon.com/512/103/103524.png');
-            background-size: 1px;
+            background-size: 2px;
             background-repeat: repeat;
         }
 
-        /* Blood splatter background */
+        /* BLOOD BACKGROUND */
         body::before {
             content: '';
             position: fixed;
@@ -34,6 +37,279 @@
             height: 100%;
             background-image: url('https://cdn-icons-png.flaticon.com/512/3060/3060978.png'), 
                               url('https://cdn-icons-png.flaticon.com/512/3060/3060980.png'),
+                              url('https://cdn-icons-png.flaticon.com/512/3060/3060979.png');
+            background-size: 180px, 220px, 120px;
+            background-repeat: repeat;
+            opacity: 0.2;
+            z-index: -3;
+        }
+
+        /* FLICKERING EFFECT FOR DISCOMFORT */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: -2;
+            animation: flicker 0.15s infinite alternate;
+        }
+
+        /* BLOODY HANDS EVERYWHERE */
+        .hand-prints {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159288.png'),
+                              url('https://cdn-icons-png.flaticon.com/512/4159/4159290.png'),
+                              url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png'),
+                              url('https://cdn-icons-png.flaticon.com/512/4159/4159291.png');
+            background-size: 220px, 200px, 180px, 160px;
+            background-position: 10% 20%, 85% 75%, 45% 40%, 65% 15%;
+            background-repeat: no-repeat;
+            opacity: 0.3;
+            z-index: -1;
+            animation: moveHands 35s infinite alternate;
+        }
+
+        /* YOUTUBE-STYLE LAYOUT BUT EMPTY */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-bottom: 3px solid #990000;
+            position: sticky;
+            top: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 10;
+            /* RANCID DISTORTION */
+            animation: warp 10s infinite alternate;
+            border-right: 2px solid #550000;
+            border-bottom: 4px solid #550000;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff3333;
+            letter-spacing: 4px;
+            /* SHAKY/RANCID LOOK */
+            animation: shake 0.3s infinite alternate;
+            text-shadow: 2px 2px 0 #550000;
+        }
+
+        .search-bar {
+            width: 400px;
+            height: 35px;
+            border: 2px solid #550000;
+            background: #151515;
+            padding: 5px;
+            color: #990000;
+            /* RANCID STRETCH */
+            animation: stretch 8s infinite alternate;
+            box-shadow: inset 1px 1px 0 #770000;
+        }
+
+        .upload-btn {
+            padding: 8px 16px;
+            background: #990000;
+            border: none;
+            color: #000;
+            font-size: 14px;
+            /* SHAKY/RANCID LOOK */
+            animation: shake 0.6s infinite alternate;
+            border-top: 2px solid #bb2222;
+            border-left: 2px solid #bb2222;
+            border-right: 2px solid #550000;
+            border-bottom: 2px solid #550000;
+        }
+
+        /* INFINITE SCROLL - NO CONTENT INSIDE */
+        main {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+            /* DISCOMFORTING MOVEMENT */
+            animation: shift 20s infinite alternate;
+        }
+
+        /* EMPTY CARDS - NO VIDEOS, NO TEXT INSIDE */
+        .card {
+            height: 180px;
+            border: 2px solid #990000;
+            border-radius: 2px;
+            position: relative;
+            /* DISCOMFORTING DEFORMATION */
+            animation: deform 6s infinite alternate, fadeIn 2s forwards;
+            opacity: 0;
+            border-right: 3px solid #550000;
+            border-bottom: 3px solid #550000;
+        }
+
+        /* BLOOD ON CARDS - NO OTHER CONTENT */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 5%;
+            left: 10%;
+            width: 80%;
+            height: 70%;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/3060/3060982.png');
+            background-size: cover;
+            opacity: 0.4;
+            /* BLOOD DRIPPING EFFECT */
+            animation: drip 15s infinite alternate;
+        }
+
+        /* FLOATING BLOODY HANDS */
+        .floating-hand {
+            position: absolute;
+            width: 100px;
+            height: 130px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/4159/4159289.png');
+            background-size: cover;
+            opacity: 0.25;
+            animation: float 25s infinite linear;
+        }
+
+        /* RANCID FOOTER TEXT */
+        .rancid-footer {
+            position: fixed;
+            bottom: 5px;
+            left: 5px;
+            font-size: 9px;
+            color: #990000;
+            animation: glitch 2.5s infinite alternate;
+        }
+
+        /* ALL ANIMATIONS FOR DISCOMFORT */
+        @keyframes flicker {
+            0% { background: rgba(0,0,0,0.7); }
+            100% { background: rgba(0,0,0,0.85); }
+        }
+
+        @keyframes moveHands {
+            0% { background-position: 10% 20%, 85% 75%, 45% 40%, 65% 15%; }
+            100% { background-position: 12% 23%, 83% 78%, 47% 42%, 63% 18%; }
+        }
+
+        @keyframes warp {
+            0% { transform: skewX(0deg); }
+            100% { transform: skewX(2deg); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0) rotate(0deg); }
+            100% { transform: translateX(2px) rotate(1deg); }
+        }
+
+        @keyframes stretch {
+            0% { width: 400px; }
+            100% { width: 440px; }
+        }
+
+        @keyframes shift {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-5px) translateX(3px); }
+        }
+
+        @keyframes deform {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.02) rotate(1deg); }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 0.8; }
+        }
+
+        @keyframes drip {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(6px); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(-120px) rotate(0deg); left: calc(Math.random() * 100)%; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes glitch {
+            0% { content: 'VERSION 1998.07b - DISK ERROR 0x0000005D'; }
+            33% { content: 'VERSION 1998.07b - DISK ERR┐OR 0x0000005D'; }
+            66% { content: 'VERSION 1998.07b - DI┐SK ERROR 0x000┐0005D'; }
+            100% { content: 'VERSION 1998.07b - DISK ERROR 0x0000005┐D'; }
+        }
+
+        /* MOBILE ADAPTIVE */
+        @media (max-width: 768px) {
+            .search-bar { width: 200px; }
+            main { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+            .hand-prints { background-size: 160px, 140px, 120px, 100px; }
+        }
+    </style>
+    <!-- RUSTY ICON -->
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/216/216788.png" type="image/x-icon">
+</head>
+<body>
+    <!-- BLOODY HAND PRINTS LAYER -->
+    <div class="hand-prints"></div>
+
+    <!-- YOUTUBE-STYLE HEADER BUT EMPTY -->
+    <header>
+        <div class="logo">YEWTOOB_98</div>
+        <input type="text" class="search-bar" placeholder="...SEARCH...">
+        <button class="upload-btn">U P L O A D</button>
+    </header>
+
+    <!-- INFINITE SCROLL CONTAINER -->
+    <main id="infinite-container"></main>
+
+    <!-- RANCID FOOTER -->
+    <div class="rancid-footer"></div>
+
+    <script>
+        const container = document.getElementById('infinite-container');
+        let cardAmount = 30;
+
+        // INITIAL CARDS
+        createCards(cardAmount);
+
+        // SPAWN FLOATING BLOODY HANDS NON-STOP
+        setInterval(() => {
+            const hand = document.createElement('div');
+            hand.className = 'floating-hand';
+            hand.style.left = `${Math.random() * 100}%`;
+            hand.style.animationDuration = `${15 + Math.random() * 20}s`;
+            document.body.appendChild(hand);
+            setTimeout(() => hand.remove(), 30000);
+        }, 1000);
+
+        // INFINITE SCROLL - GENERATE MORE EMPTY CARDS FOREVER
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+                cardAmount += 20;
+                createCards(20);
+            }
+        });
+
+        // CREATE ONLY EMPTY CARDS - NO CONTENT AT ALL
+        function createCards(amount) {
+            for (let i = 0; i < amount; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = `${i * 0.1}s`;
+                container.appendChild(card);
+            }
+        }
+    </script>
+</body>
+</html>
                               url('https://cdn-icons-png.flaticon.com/512/3060/3060979.png');
             background-size: 180px, 220px, 120px;
             background-repeat: repeat;
